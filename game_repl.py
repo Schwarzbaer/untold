@@ -3,64 +3,86 @@
 import json
 from pprint import pprint
 
-divider = '----------------------------------------------------------------------\n'
-start_menu = \
-"""start: Start new game. (Not implemented)
-list : Show list of savegames. (Not implemented)
-load : Load a savegame. (Not implemented)
-quit : Exit game.
-exit : Exit game.
-"""
+# STORY CORE
+
+def eval_condition(node, state):
+    var = node['var']
+    val = node['val']
+    if var in state.keys():
+        return val == state[var]
+    else:
+        return val == None
 
 TEXT_MODE = 1
 
-class Representation:
-    def __init__(self, node, history, mode = TEXT_MODE):
-        self.node = node
-        self.history = history
-        self.mode = mode
-    def get_premise(self):
-        # FIXME: Re
-        return None
+def eval_story_node(node, state):
+    # FIXME: Extract triplet from node
+    if 'story' in node.keys():
+        story = node['story']
+    else:
+        story = False
+    if 'actable' in node.keys():
+        actable = node['actable']
+    else:
+        actable = False
+    if 'autoact' in node.keys():
+        autoact = node['autoact']
+    else:
+        autoact = False
+    return (story, actable, autoact)
+
+def eval_case_node(node, state):
+    # FIXME: Find active leaf
+    for leaf in node['case']:
+        condition = leaf['cond']
+        if eval_condition(condition, state):
+            return eval_root_node(leaf, state)
+    # FIXME: Raise exception. No applicable case has been found.
+    return False
+
+node_funcs = {
+    'story': eval_story_node,
+    'actable': eval_story_node,
+    'autoact': eval_story_node,
+    'case': eval_case_node,
+}
+
+def eval_root_node(node, state):
+    node_func_keys = node_funcs.keys()
+    for key in node.keys():
+        if key in node_func_keys:
+            return node_funcs[key](node, state)
+    # FIXME: Raise exception, as there is no function to handle this node.
+    return False
 
 class Story:
     def __init__(self, mode = TEXT_MODE):
         self.mode = mode
     def load(self, filename = 'story.json'):
         # Read story
-        self.story_nodes = {}
+        self.story = {}
         f = open(filename, 'r')
         for line in f.readlines():
             node = json.loads(line)
-            self.story_nodes[node['id']] = node
+            self.story[node['id']] = node
         f.close()
         # Set starting state
-        self.story_state = {'current_node': 'start'}
+        self.state = {}#{'warrior_on_field': 'plundered'}
         self.history = []
         # current_node = self.story_nodes[self.story_state]
         # FIXME: Create representation object
         # return self.act(None)
-    def eval_stored_node(self, node_id):
-        story = self.story_nodes[node_id]['story']
-        self.eval_node(story)
-    # Evaluating JSON nodes to representation/actables/autoact triplets
-    def eval_node(self, node):
-        node_keys = node.keys()
-        if any([story_key in node_keys for story_key in ['story', 'act', 'autoact']]):
-            # This is a story node
-            return self.eval_story_node(node)
-        elif any([script_key in node_keys for script_key in ['case']]):
-            return self.eval_node(self.eval_case_node)
-        else:
-            print('Node is broken')
-    def eval_story_node(self, node):
-        print('Exec story node')
-        representation = ''
-        if 'scene' in node.keys():
-            representation = node['scene']['text']+'\n'
-        return (representation, actables, autoact)
-    def eval_case_node(self, node):
-        return decased_node
+    def eval_node(self, node_id):
+        node = self.story[node_id]
+        return eval_root_node(node, self.state)
+    def enact(self, action):
+        if 'goto' in action:
+            self.state['current_node'] = action['goto']
+    # Game Flow
+    def start(self):
+        self.enact({'goto': 'start'})
+    def eval_current_node(self):
+        return self.eval_node(self.state['current_node'])
 
 # Game states
 PRE_GAME = 1
@@ -86,15 +108,32 @@ class GameManager:
             elif commands[0] == 'start': # Start a new game
                 self.story = Story()
                 self.story.load()
+                self.story.start()
                 self.state = IN_GAME
-                return (PROCEED, "Story loaded.")
+                return (REPOLL, "Story loaded.")
             else:
                 return(PROCEED, "Unknown command.")
         elif self.state == IN_GAME:
+            if command != '':
+                pass # FIXME: Typical game step here, actually
+            else:
+                # FIXME: Make sure that this really is the start of the game!
+                pass
             representation = self.story.step()
             return(PROCEED, representation)
         else:
             return (EXIT, "No proper state.")
+
+# REPL
+
+divider = '----------------------------------------------------------------------\n'
+start_menu = \
+"""start: Start new game. (Not implemented)
+list : Show list of savegames. (Not implemented)
+load : Load a savegame. (Not implemented)
+quit : Exit game.
+exit : Exit game.
+"""
 
 if __name__ == '__main__':
     game = GameManager()
