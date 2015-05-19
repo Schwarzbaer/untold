@@ -2,10 +2,9 @@
 
 # Node
 # * id: id
-# * story: Story or Script
 #
-# Story
-# * scene: Scene
+# Story (Node)
+# * story: Scene
 # * actable: [Interactions]
 # * autoact: {Consequences}
 #
@@ -26,46 +25,45 @@
 
 story = [
 {'id': 'start',
- 'story': {'scene': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
-                    },
-           'autoact': {'goto': 'field',
-                      },
+ 'story': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
           },
+ 'autoact': {'goto': 'field',
+            },
 },
 {'id': 'forest',
- 'text': '',
+ 'story': {'text': '',
+          },
 },
 {'id': 'field',
- 'story': {'case': [{'cond': {'var': 'warrior_on_field',
-                              'val': None,
-                             },
-                     'scene': {'text': 'A fallen warrior lies face-down on the ground.',
-                              },
-                     'actable': [{'text': 'Search warrior',
-                                  'result': {'goto': 'field',
-                                             'set': {'var': 'warrior_on_field',
-                                                     'val': 'examined',
-                                                    },
-                                            },
-                                 },
-                                 {'text': 'Leave battlefield',
-                                  'result': {'goto': 'forest'}
-                                 },
-                                ],
+ 'case': [{'cond': {'var': 'warrior_on_field',
+                    'val': None,
+                   },
+           'story': {'text': 'A fallen warrior lies face-down on the ground.',
                     },
-                    {'cond': {'var': 'warrior_on_field',
-                              'val': 'examined',
-                             },
-                     'scene': {'text': 'The fallen warrior stares blankly into the sky, an amulet on his chest glittering in the sunlight.',
-                              },
-                    },
-                    {'cond': {'var': 'warrior_on_field',
-                              'val': 'plundered'},
-                     'scene': {'text': 'The fallen warrior that you have looted stares blaknly into the sky, beyond accusation.',
-                              },
-                    },
-                   ],
+           'actable': [{'text': 'Search warrior',
+                        'result': {'goto': 'field',
+                                   'set': {'var': 'warrior_on_field',
+                                           'val': 'examined',
+                                          },
+                                  },
+                       },
+                       {'text': 'Leave battlefield',
+                        'result': {'goto': 'forest'}
+                       },
+                      ],
           },
+          {'cond': {'var': 'warrior_on_field',
+                    'val': 'examined',
+                   },
+           'story': {'text': 'The fallen warrior stares blankly into the sky, an amulet on his chest glittering in the sunlight.',
+                    },
+          },
+          {'cond': {'var': 'warrior_on_field',
+                    'val': 'plundered'},
+           'story': {'text': 'The fallen warrior that you have looted stares blankly into the sky, beyond accusation.',
+                    },
+          },
+         ],
 },
 ]
 
