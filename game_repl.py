@@ -3,30 +3,52 @@
 import json
 from pprint import pprint
 
-# Scripting elements
-
 # Conditions
-# Returns True or False
-# {var: varname, val: value} # DONE: Exact match: TODO: value in list-in-state-variable
-# {var: varname, val: [value]} # TODO: Both list-in-state-variable and conditional-value can be lists
-# {var: varname, val_gt: value1, val_lt: value2} # TODO
-# {cond_list: [list of conditions]} # TODO
-# TODO
-def eval_condition(node, state):
-    var = node['var']
-    val = node['val']
+
+def eval_condition(cond_node, state):
+    # Returns True or False
+    # {var: varname, val: value} # DONE: Exact match: TODO: value in list-in-state-variable
+    # {var: varname, val: [value]} # TODO: Both list-in-state-variable and conditional-value can be lists
+    # {var: varname, val_gt: value1, val_lt: value2} # TODO
+    # {cond_list: [list of conditions]} # TODO
+    var = cond_node['var']
+    val = cond_node['val']
     if var in state.keys():
         return val == state[var]
     else:
         return val == None
 
+# Scripting elements
+
+script_funcs = {
+    'case': eval_case_node,
+}
+
+func_tags = set(script_func.keys())
+
+def node_has_script_elements(node):
+    return any([script_tag in node for script_tag in script_funcs.keys()])
+
+def eval_script_node(node, state):
+    cont = True
+    while cont:
+        node_tags = set(node.keys())
+        tag = next((tag for tag in node_tags if tag in func_tags), False)
+        if tag:
+            node = script_funcs[tag](node, state)
+        else:
+            cont = False
+    return node
+
 # CASE structure
 # {case: [{cond: {}, foo}]} # Returns the first foo-containing node for which cond is true
-def eval_case_node(node, state):
+def eval_case_node(case_node, state):
     # FIXME: Find active leaf
-    for leaf in node['case']:
+    for leaf in case_node['case']:
         condition = leaf['cond']
         if eval_condition(condition, state):
+            # FIXME: Instead, take the case clause out of the node, and merge the leaf into it.
+            # FIXME: NO! DO NOT mutate the nodes!
             return eval_root_node(leaf, state)
     # FIXME: Raise exception. No applicable case has been found.
     return False
@@ -52,14 +74,17 @@ def eval_story_node(node, state):
         autoact = False
     return (story, actable, autoact)
 
+# ROOT NODES
+# The nodes that a game consists of, stories, actables, autoacts.
+
 node_funcs = {
     'story': eval_story_node,
     'actable': eval_story_node,
     'autoact': eval_story_node,
-    'case': eval_case_node,
 }
 
 def eval_root_node(node, state):
+    node = eval_script_node(node, state)
     node_func_keys = node_funcs.keys()
     for key in node.keys():
         if key in node_func_keys:

@@ -28,7 +28,7 @@
 # * Script
 
 
-story = [
+battle_story = [
 {'id': 'start',
  'story': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
           },
