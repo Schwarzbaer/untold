@@ -3,8 +3,15 @@
 import json
 from pprint import pprint
 
-# STORY CORE
+# Scripting elements
 
+# Conditions
+# Returns True or False
+# {var: varname, val: value} # DONE: Exact match: TODO: value in list-in-state-variable
+# {var: varname, val: [value]} # TODO: Both list-in-state-variable and conditional-value can be lists
+# {var: varname, val_gt: value1, val_lt: value2} # TODO
+# {cond_list: [list of conditions]} # TODO
+# TODO
 def eval_condition(node, state):
     var = node['var']
     val = node['val']
@@ -13,10 +20,24 @@ def eval_condition(node, state):
     else:
         return val == None
 
+# CASE structure
+# {case: [{cond: {}, foo}]} # Returns the first foo-containing node for which cond is true
+def eval_case_node(node, state):
+    # FIXME: Find active leaf
+    for leaf in node['case']:
+        condition = leaf['cond']
+        if eval_condition(condition, state):
+            return eval_root_node(leaf, state)
+    # FIXME: Raise exception. No applicable case has been found.
+    return False
+
 TEXT_MODE = 1
 
+# Structural nodes
+
+# STORY
+# A node containing at least an actable or autoact, and optionally a story
 def eval_story_node(node, state):
-    # FIXME: Extract triplet from node
     if 'story' in node.keys():
         story = node['story']
     else:
@@ -30,15 +51,6 @@ def eval_story_node(node, state):
     else:
         autoact = False
     return (story, actable, autoact)
-
-def eval_case_node(node, state):
-    # FIXME: Find active leaf
-    for leaf in node['case']:
-        condition = leaf['cond']
-        if eval_condition(condition, state):
-            return eval_root_node(leaf, state)
-    # FIXME: Raise exception. No applicable case has been found.
-    return False
 
 node_funcs = {
     'story': eval_story_node,
@@ -76,6 +88,9 @@ class Story:
         node = self.story[node_id]
         return eval_root_node(node, self.state)
     def enact(self, action):
+        if 'set' in action:
+            self.state[action['set']['var']] = action['set']['val']
+            print("set %s to %s" % (action['set']['var'], action['set']['val'],))
         if 'goto' in action:
             self.state['current_node'] = action['goto']
     # Game Flow
@@ -114,8 +129,9 @@ class GameManager:
             else:
                 return(PROCEED, "Unknown command.")
         elif self.state == IN_GAME:
-            if command != '':
-                pass # FIXME: Typical game step here, actually
+            if commands[0] == '':
+                triplet = self.story.eval_current_node()
+                return (PROCEED, triplet)
             else:
                 # FIXME: Make sure that this really is the start of the game!
                 pass
@@ -128,37 +144,61 @@ class GameManager:
 
 divider = '----------------------------------------------------------------------\n'
 start_menu = \
-"""start: Start new game. (Not implemented)
+"""start: Start new game.
 list : Show list of savegames. (Not implemented)
 load : Load a savegame. (Not implemented)
 quit : Exit game.
 exit : Exit game.
 """
 
+#if __name__ == '__main__':
+#    game = GameManager()
+#    meta, output = game.command()
+#
+#    # A simple REPL to drive the Game Manager interactively in lieu of a
+#    # graphical interface.
+#    print("Interactive Storytelling REPL v0.1")
+#    cont = True
+#
+#    while cont:
+#        print(output)
+#        try:
+#            if meta == PROCEED:
+#                cmd = input('> ')
+#            elif meta == REPOLL:
+#                cmd = ''
+#            else:
+#                # Something's fucky
+#                break # FIXME: Better do some exception or so.
+#            (meta, output) = game.command(cmd)
+#            if meta == EXIT:
+#                cont = False
+#        except EOFError:
+#            print()
+#            cont = False
+#    print(output)
+
 if __name__ == '__main__':
-    game = GameManager()
-    meta, output = game.command()
-
-    # A simple REPL to drive the Game Manager interactively in lieu of a
-    # graphical interface.
-    print("Interactive Storytelling REPL v0.1")
-    cont = True
-
-    while cont:
-        print(output)
-        try:
-            if meta == PROCEED:
-                cmd = input('> ')
-            elif meta == REPOLL:
-                cmd = ''
+    s = Story()
+    s.load()
+    s.start()
+    while True:
+        story, actables, autoacts = s.eval_current_node()
+        if story:
+            print(story['text'])
+        if actables:
+            for act_id in range(0, len(actables)):
+                print("%d) %s" % (act_id+1, actables[act_id]['text']))
+        if autoacts and not actables:
+            s.enact(autoacts)
+        else:
+            #if autoacts:
+            #    print("a) %s" % (str(autoacts),))
+            cmd = input('> ')
+            if cmd=="a":
+                s.enact(autoacts)
             else:
-                # Something's fucky
-                break # FIXME: Better do some exception or so.
-            (meta, output) = game.command(cmd)
-            if meta == EXIT:
-                cont = False
-        except EOFError:
-            print()
-            cont = False
-    print(output)
+                cmd_id = int(cmd)-1
+                s.enact(actables[cmd_id]['result'])
+                #print("Executed %d: %s" % (cmd_id, str(actables[cmd_id])))
 
