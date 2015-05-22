@@ -7,10 +7,13 @@ from pprint import pprint
 
 def eval_condition(cond_node, state):
     # Returns True or False
+    # True, False: Return just that
     # {var: varname, val: value} # DONE: Exact match: TODO: value in list-in-state-variable
     # {var: varname, val: [value]} # TODO: Both list-in-state-variable and conditional-value can be lists
     # {var: varname, val_gt: value1, val_lt: value2} # TODO
     # {cond_list: [list of conditions]} # TODO
+    if type(cond_node) == bool:
+        return cond_node
     var = cond_node['var']
     val = cond_node['val']
     if var in state.keys():
@@ -41,15 +44,20 @@ def eval_script_node(node, state):
     return node
 
 # CASE structure
-# {case: [{cond: {}, foo}]} # Returns the first foo-containing node for which cond is true
+# {case: [{cond: True, foo: 1}],
+#  bar: 1}
+# returns
+# {foo: 1, bar: 1}
+# Returns the first foo-containing node for which cond is true
 def eval_case_node(case_node, state):
     # FIXME: Find active leaf
     for leaf in case_node['case']:
         condition = leaf['cond']
         if eval_condition(condition, state):
-            # FIXME: Instead, take the case clause out of the node, and merge the leaf into it.
-            # FIXME: NO! DO NOT mutate the nodes!
-            return eval_root_node(leaf, state)
+            virt_node = case_node.copy()
+            del virt_node['case']
+            virt_node.update(leaf)
+            return virt_node
     # FIXME: Raise exception. No applicable case has been found.
     return False
 

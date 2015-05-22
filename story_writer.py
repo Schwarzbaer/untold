@@ -27,6 +27,15 @@
 # * result: Consequences
 # * Script
 
+case_test = [
+{'id': 'start',
+ 'case': [{'cond': True,
+           'story': 'Boolean node',
+           'autoact': {'goto': 'test_2'},
+          },
+         ],
+},
+]
 
 battle_story = [
 {'id': 'start',
