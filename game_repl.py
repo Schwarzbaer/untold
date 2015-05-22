@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
+# TODO:
+# Consider i18n/l10 and templating
+# Turn list-of-JSON-docs into one doc.
+#   Add metadata: starting node, default node, author / copyright
+# Lots of condition improvements
+
 import json
 from pprint import pprint
 
-# Conditions
+# Conditions ---------------------------------------------------------
 
 def eval_condition(cond_node, state):
     # Returns True or False
@@ -21,27 +27,7 @@ def eval_condition(cond_node, state):
     else:
         return val == None
 
-# Scripting elements
-
-script_funcs = {
-    'case': eval_case_node,
-}
-
-func_tags = set(script_func.keys())
-
-def node_has_script_elements(node):
-    return any([script_tag in node for script_tag in script_funcs.keys()])
-
-def eval_script_node(node, state):
-    cont = True
-    while cont:
-        node_tags = set(node.keys())
-        tag = next((tag for tag in node_tags if tag in func_tags), False)
-        if tag:
-            node = script_funcs[tag](node, state)
-        else:
-            cont = False
-    return node
+# Scripting elements -------------------------------------------------
 
 # CASE structure
 # {case: [{cond: True, foo: 1}],
@@ -49,6 +35,10 @@ def eval_script_node(node, state):
 # returns
 # {foo: 1, bar: 1}
 # Returns the first foo-containing node for which cond is true
+
+class CaseWithoutActiveCond(Exception):
+    pass
+
 def eval_case_node(case_node, state):
     # FIXME: Find active leaf
     for leaf in case_node['case']:
@@ -58,47 +48,77 @@ def eval_case_node(case_node, state):
             del virt_node['case']
             virt_node.update(leaf)
             return virt_node
-    # FIXME: Raise exception. No applicable case has been found.
-    return False
+    raise CaseWithoutActiveCond
+
+# Managerial
+
+script_funcs = {
+    'case': eval_case_node,
+}
+
+func_tags = set(script_funcs.keys())
+
+def node_has_script_elements(node):
+    return any([script_tag in node for script_tag in script_funcs.keys()])
+
+def eval_script_node(node, state):
+    cont = node_has_script_elements(node)
+    while cont:
+        # print("eval_script_node: %s" % (str(node), ))
+        node_tags = set(node.keys())
+        tag = next((tag for tag in node_tags if tag in func_tags), False)
+        if tag:
+            node = script_funcs[tag](node, state)
+        else:
+            cont = False
+    return node
 
 TEXT_MODE = 1
 
-# Structural nodes
+# Scene nodes --------------------------------------------------------
 
-# STORY
-# A node containing at least an actable or autoact, and optionally a story
-def eval_story_node(node, state):
-    if 'story' in node.keys():
-        story = node['story']
+def eval_scene_node(node, state):
+    if 'scene' in node.keys():
+        scene = eval_script_node(node['scene'], state)
     else:
-        story = False
+        scene = False
     if 'actable' in node.keys():
-        actable = node['actable']
+        actable = eval_script_node(node['actable'], state)
     else:
         actable = False
     if 'autoact' in node.keys():
-        autoact = node['autoact']
+        autoact = eval_script_node(node['autoact'], state)
     else:
         autoact = False
-    return (story, actable, autoact)
+    return (scene, actable, autoact)
 
-# ROOT NODES
-# The nodes that a game consists of, stories, actables, autoacts.
+# Root nodes ---------------------------------------------------------
+
+class StoryExited(Exception):
+    pass
+
+def eval_special_node(node, state):
+    if node['special'] == 'exit':
+        raise StoryExited
 
 node_funcs = {
-    'story': eval_story_node,
-    'actable': eval_story_node,
-    'autoact': eval_story_node,
+    'scene': eval_scene_node,
+    'actable': eval_scene_node,
+    'autoact': eval_scene_node,
+    'special': eval_special_node,
 }
 
 def eval_root_node(node, state):
     node = eval_script_node(node, state)
+    # print("eval_root_node %s" % (str(node), ))
     node_func_keys = node_funcs.keys()
     for key in node.keys():
         if key in node_func_keys:
             return node_funcs[key](node, state)
     # FIXME: Raise exception, as there is no function to handle this node.
     return False
+
+# --------------------------------------------------------------------
 
 class Story:
     def __init__(self, mode = TEXT_MODE):
@@ -123,7 +143,7 @@ class Story:
     def enact(self, action):
         if 'set' in action:
             self.state[action['set']['var']] = action['set']['val']
-            print("set %s to %s" % (action['set']['var'], action['set']['val'],))
+            # print("set %s to %s" % (action['set']['var'], action['set']['val'],))
         if 'goto' in action:
             self.state['current_node'] = action['goto']
     # Game Flow
@@ -132,48 +152,48 @@ class Story:
     def eval_current_node(self):
         return self.eval_node(self.state['current_node'])
 
-# Game states
-PRE_GAME = 1
-IN_GAME = 2
-# Return codes for the REPL
-PROCEED = 0
-EXIT = 1
-REPOLL = 2 # send an empty command without prompting for input
+## Game states
+#PRE_GAME = 1
+#IN_GAME = 2
+## Return codes for the REPL
+#PROCEED = 0
+#EXIT = 1
+#REPOLL = 2 # send an empty command without prompting for input
+#
+#class GameManager:
+#    """An abstraction between the actual story manager and the
+#    interface, providing input parsing, and later on possibly time-
+#    related event driving.
+#    """
+#    def __init__(self):
+#        self.state = PRE_GAME
+#    def command(self, *commands):
+#        if self.state == PRE_GAME:
+#            if len(commands) == 0: # Autostart
+#                return (PROCEED, divider + start_menu)
+#            elif commands[0] in ['quit', 'exit']:
+#                return(EXIT, "Terminating.")
+#            elif commands[0] == 'start': # Start a new game
+#                self.story = Story()
+#                self.story.load()
+#                self.story.start()
+#                self.state = IN_GAME
+#                return (REPOLL, "Story loaded.")
+#            else:
+#                return(PROCEED, "Unknown command.")
+#        elif self.state == IN_GAME:
+#            if commands[0] == '':
+#                triplet = self.story.eval_current_node()
+#                return (PROCEED, triplet)
+#            else:
+#                # FIXME: Make sure that this really is the start of the game!
+#                pass
+#            representation = self.story.step()
+#            return(PROCEED, representation)
+#        else:
+#            return (EXIT, "No proper state.")
 
-class GameManager:
-    """An abstraction between the actual story manager and the
-    interface, providing input parsing, and later on possibly time-
-    related event driving.
-    """
-    def __init__(self):
-        self.state = PRE_GAME
-    def command(self, *commands):
-        if self.state == PRE_GAME:
-            if len(commands) == 0: # Autostart
-                return (PROCEED, divider + start_menu)
-            elif commands[0] in ['quit', 'exit']:
-                return(EXIT, "Terminating.")
-            elif commands[0] == 'start': # Start a new game
-                self.story = Story()
-                self.story.load()
-                self.story.start()
-                self.state = IN_GAME
-                return (REPOLL, "Story loaded.")
-            else:
-                return(PROCEED, "Unknown command.")
-        elif self.state == IN_GAME:
-            if commands[0] == '':
-                triplet = self.story.eval_current_node()
-                return (PROCEED, triplet)
-            else:
-                # FIXME: Make sure that this really is the start of the game!
-                pass
-            representation = self.story.step()
-            return(PROCEED, representation)
-        else:
-            return (EXIT, "No proper state.")
-
-# REPL
+# REPL ---------------------------------------------------------------
 
 divider = '----------------------------------------------------------------------\n'
 start_menu = \
@@ -216,22 +236,25 @@ if __name__ == '__main__':
     s.load()
     s.start()
     while True:
-        story, actables, autoacts = s.eval_current_node()
-        if story:
-            print(story['text'])
-        if actables:
-            for act_id in range(0, len(actables)):
-                print("%d) %s" % (act_id+1, actables[act_id]['text']))
-        if autoacts and not actables:
-            s.enact(autoacts)
-        else:
-            #if autoacts:
-            #    print("a) %s" % (str(autoacts),))
-            cmd = input('> ')
-            if cmd=="a":
+        try:
+            scene, actables, autoacts = s.eval_current_node()
+            if scene:
+                print(scene['text'])
+            if actables:
+                for act_id in range(0, len(actables)):
+                    print("%d) %s" % (act_id+1, actables[act_id]['text']))
+            if autoacts and not actables:
                 s.enact(autoacts)
             else:
-                cmd_id = int(cmd)-1
-                s.enact(actables[cmd_id]['result'])
-                #print("Executed %d: %s" % (cmd_id, str(actables[cmd_id])))
+                #if autoacts:
+                #    print("a) %s" % (str(autoacts),))
+                cmd = input('> ')
+                if cmd=="a":
+                    s.enact(autoacts)
+                else:
+                    cmd_id = int(cmd)-1
+                    s.enact(actables[cmd_id]['result'])
+                    #print("Executed %d: %s" % (cmd_id, str(actables[cmd_id])))
+        except StoryExited:
+            break
 

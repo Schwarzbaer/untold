@@ -2,6 +2,7 @@
 
 # Node
 # * id: id
+# * 
 #
 # Story (Node)
 # * story: Scene
@@ -28,18 +29,63 @@
 # * Script
 
 case_test = [
-{'id': 'start',
- 'case': [{'cond': True,
-           'story': 'Boolean node',
-           'autoact': {'goto': 'test_2'},
-          },
-         ],
-},
-]
+ {'id': 'start',
+  'case': [{'cond': True,
+            'scene': {'text': 'Testing boolean node'},
+            'autoact': {'goto': 'test_2'},
+           },
+          ],
+ },
+ {'id': 'test_2',
+  'case': [{'cond': {'var': 'var1',
+                     'val': None},
+            'scene': {'text': 'Testing var for absence'},
+            'autoact': {'goto': 'test_3',
+                        'set': {'var': 'var1',
+                                'val': 1},
+                       },
+           },
+          ],
+ },
+ {'id': 'test_3',
+  'case': [{'cond': {'var': 'var1',
+                     'val': 1},
+            'scene': {'text': 'Testing var for value'},
+            'autoact': {'goto': 'test_4',
+                       },
+           },
+          ],
+ },
+ {'id': 'test_4',
+  'scene': {'case': [{'cond': {'var': 'var1',
+                               'val': 1,
+                              },
+                      'text': 'Testing case-in-scene/autoact.'
+                     },
+                     {'cond': True,
+                      'text': 'case-in-scene/autoact failed.'
+                     },
+                    ],
+           },
+  'autoact': {'case': [{'cond': {'var': 'var1',
+                                 'val': 1,
+                                },
+                        'goto': 'done',
+                       },
+                       {'cond': True,
+                        'goto': 'broken',
+                       },
+                      ],
+             },
+ },
+ {'id': 'done',
+  'special': 'exit',
+ }
+ ]
 
 battle_story = [
 {'id': 'start',
- 'story': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
+ 'scene': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
           },
  'autoact': {'goto': 'field',
             },
@@ -48,7 +94,7 @@ battle_story = [
  'case': [{'cond': {'var': 'warrior_on_field',
                     'val': None,
                    },
-           'story': {'text': 'A fallen warrior lies face-down on the ground.',
+           'scene': {'text': 'A fallen warrior lies face-down on the ground.',
                     },
            'actable': [{'text': 'Search warrior',
                         'result': {'goto': 'field',
@@ -65,7 +111,7 @@ battle_story = [
           {'cond': {'var': 'warrior_on_field',
                     'val': 'examined',
                    },
-           'story': {'text': 'The fallen warrior stares blankly into the sky, an amulet on his chest glittering in the sunlight.',
+           'scene': {'text': 'The fallen warrior stares blankly into the sky, an amulet on his chest glittering in the sunlight.',
                     },
            'actable': [{'text': 'Take amulet',
                         'result': {'goto': 'field',
@@ -81,7 +127,7 @@ battle_story = [
           },
           {'cond': {'var': 'warrior_on_field',
                     'val': 'plundered'},
-           'story': {'text': 'The fallen warrior that you have looted stares blankly into the sky, beyond accusation.',
+           'scene': {'text': 'The fallen warrior that you have looted stares blankly into the sky, beyond accusation.',
                     },
            'actable': [{'text': 'Leave battlefield',
                         'result': {'goto': 'forest'}
@@ -91,7 +137,7 @@ battle_story = [
          ],
 },
 {'id': 'forest',
- 'story': {'text': 'A well-trodden path stretches between dense trees under a dark canopy. In the distance, a villager gathers firewood.',
+ 'scene': {'text': 'A well-trodden path stretches between dense trees under a dark canopy. In the distance, a villager gathers firewood.',
           },
  'actable': [{'text': 'Away from the battlefield.',
               'result': {'goto': 'villager'
@@ -105,10 +151,10 @@ battle_story = [
 {'id': 'villager',
  'case': [{'cond': {'var': 'warrior_on_field',
                     'val': 'plundered'},
-           'story': {'text': 'The old woman interrupts her work and turns around to greet you, a tired smile on her face, but as soon as she sees the dead soldiers amulet on your chest, she breaks into tears.'},
+           'scene': {'text': 'The old woman interrupts her work and turns around to greet you, a tired smile on her face, but as soon as she sees the dead soldiers amulet on your chest, she breaks into tears.'},
           },
           {'cond': 'else',
-           'story': {'text': 'The old woman interrupts her work and turns around, a tired smile on her face. "Hello, young man, what brings you this way?"' },
+           'scene': {'text': 'The old woman interrupts her work and turns around, a tired smile on her face. "Hello, young man, what brings you this way?"' },
            'actable': [{'text': 'Nothing.',
                         'result': {'goto': 'forest'},
                        },
@@ -129,6 +175,8 @@ battle_story = [
 
 #--------------------------------------------------------------------
 import json
+
+story = case_test
 
 f = open('story.json', 'w')
 for story_node in story:
