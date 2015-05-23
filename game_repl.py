@@ -3,8 +3,9 @@
 # TODO:
 # Consider i18n/l10 and templating
 # Make metadata accessible
+#   Use proper start_node
 # Lots of condition improvements
-# History
+# History and rewind/forward
 
 import json
 from pprint import pprint
@@ -125,12 +126,9 @@ class Story:
         self.mode = mode
     def load(self, filename = 'story.json'):
         # Read story
-        self.story = {}
         f = open(filename, 'r')
-        document = json.loads(f.read())
-        story = document['story']
-        for node in story:
-            self.story[node['id']] = node
+        self.document = json.loads(f.read())
+        self.story = {node['id']: node for node in self.document['story']}
         f.close()
         # Set starting state
         self.state = {}
@@ -146,7 +144,7 @@ class Story:
             self.state['current_node'] = action['goto']
     # Game Flow
     def start(self):
-        self.enact({'goto': 'start'})
+        self.enact({'goto': self.document['start_node']})
     def eval_current_node(self):
         return self.eval_node(self.state['current_node'])
 

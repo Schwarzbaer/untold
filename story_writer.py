@@ -31,6 +31,7 @@
 test_story = {
  'author': 'TheCheapestPixels',
  'title': 'Test case',
+ 'start_node': 'start',
  'story': [{'id': 'start',
             'case': [{'cond': True,
                       'scene': {'text': 'Testing boolean node'},
