@@ -178,13 +178,14 @@ battle_story = {
           ],
 }
 #--------------------------------------------------------------------
+
 import json
 
-story = battle_story
-
-f = open('story.json', 'w')
-f.write(json.dumps(story))
-f.write('\n')
-print('Wrote story.')
-f.close()
+if __name__ == '__main__':
+    story = battle_story
+    f = open('story.json', 'w')
+    f.write(json.dumps(story))
+    f.write('\n')
+    print('Wrote story.')
+    f.close()
 

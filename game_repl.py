@@ -186,12 +186,19 @@ def story_repl(filename = 'story.json'):
             else:
                 # FIXME: Catch EOFError from Ctrl-d
                 cmd = input('> ')
-                if cmd=="a":
+                if False: # FIXME: REPL functions here
+                    pass
+                elif cmd=="a":
                     # FIXME: Make sure that autoact exists, otherwise reprompt
                     s.enact(autoacts)
                 else:
+                    try:
                     # FIXME: Make sure that answer is in range, otherwise reprompt
-                    cmd_id = int(cmd)-1
+                        cmd_id = int(cmd)-1
+                    except ValueError:
+                        pass # FIXME: Reprompt (What was entered wasn't an int)
+                    if cmd_id > len(actables):
+                        pass # FIXME: Reprompt (list is too long)
                     s.enact(actables[cmd_id]['result'])
         except StoryExited:
             break
