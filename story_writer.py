@@ -28,61 +28,65 @@
 # * result: Consequences
 # * Script
 
-case_test = [
- {'id': 'start',
-  'case': [{'cond': True,
-            'scene': {'text': 'Testing boolean node'},
-            'autoact': {'goto': 'test_2'},
-           },
-          ],
- },
- {'id': 'test_2',
-  'case': [{'cond': {'var': 'var1',
-                     'val': None},
-            'scene': {'text': 'Testing var for absence'},
-            'autoact': {'goto': 'test_3',
-                        'set': {'var': 'var1',
-                                'val': 1},
-                       },
-           },
-          ],
- },
- {'id': 'test_3',
-  'case': [{'cond': {'var': 'var1',
-                     'val': 1},
-            'scene': {'text': 'Testing var for value'},
-            'autoact': {'goto': 'test_4',
-                       },
-           },
-          ],
- },
- {'id': 'test_4',
-  'scene': {'case': [{'cond': {'var': 'var1',
-                               'val': 1,
-                              },
-                      'text': 'Testing case-in-scene/autoact.'
-                     },
-                     {'cond': True,
-                      'text': 'case-in-scene/autoact failed.'
+test_story = {
+ 'author': 'TheCheapestPixels',
+ 'title': 'Test case',
+ 'story': [{'id': 'start',
+            'case': [{'cond': True,
+                      'scene': {'text': 'Testing boolean node'},
+                      'autoact': {'goto': 'test_2'},
                      },
                     ],
            },
-  'autoact': {'case': [{'cond': {'var': 'var1',
-                                 'val': 1,
-                                },
-                        'goto': 'done',
+           {'id': 'test_2',
+            'case': [{'cond': {'var': 'var1',
+                               'val': None},
+                      'scene': {'text': 'Testing var for absence'},
+                      'autoact': {'goto': 'test_3',
+                                  'set': {'var': 'var1',
+                                          'val': 1},
+                                 },
+                     },
+                    ],
+           },
+           {'id': 'test_3',
+            'case': [{'cond': {'var': 'var1',
+                               'val': 1},
+                      'scene': {'text': 'Testing var for value'},
+                      'autoact': {'goto': 'test_4',
+                                 },
+                     },
+                    ],
+           },
+           {'id': 'test_4',
+            'scene': {'case': [{'cond': {'var': 'var1',
+                                         'val': 1,
+                                        },
+                                'text': 'Testing case-in-scene/autoact.'
+                               },
+                               {'cond': True,
+                                'text': 'case-in-scene/autoact failed.'
+                               },
+                              ],
+                     },
+            'autoact': {'case': [{'cond': {'var': 'var1',
+                                           'val': 1,
+                                          },
+                                  'goto': 'done',
+                                 },
+                                 {'cond': True,
+                                  'goto': 'broken',
+                                 },
+                                ],
                        },
-                       {'cond': True,
-                        'goto': 'broken',
-                       },
-                      ],
-             },
- },
- {'id': 'done',
-  'special': 'exit',
- }
- ]
+           },
+           {'id': 'done',
+            'special': 'exit',
+           },
+          ],
+}
 
+# FIXME: This is broken right now.
 battle_story = [
 {'id': 'start',
  'scene': {'text': 'As the clouds finally part, the sun reveals this mornings vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
@@ -168,20 +172,14 @@ battle_story = [
          ],
 },
 ]
-
-# FIXME
-# 'cond': 'else'
-# 'actable' is a Script
-
 #--------------------------------------------------------------------
 import json
 
-story = case_test
+story = test_story
 
 f = open('story.json', 'w')
-for story_node in story:
-    f.write(json.dumps(story_node))
-    f.write('\n')
-    print('Wrote node %s' % (story_node['id'], ))
+f.write(json.dumps(story))
+f.write('\n')
+print('Wrote story.')
 f.close()
 
