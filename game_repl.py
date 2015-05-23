@@ -2,8 +2,6 @@
 
 # TODO:
 # Consider i18n/l10 and templating
-# Make metadata accessible
-#   Use proper start_node
 # Lots of condition improvements
 #   any/all/at-least-n/at-most-n for lists of conditions
 # History and rewind/forward
