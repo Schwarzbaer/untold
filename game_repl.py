@@ -5,6 +5,7 @@
 # Make metadata accessible
 #   Use proper start_node
 # Lots of condition improvements
+#   any/all/at-least-n/at-most-n for lists of conditions
 # History and rewind/forward
 
 import json
@@ -133,6 +134,8 @@ class Story:
         # Set starting state
         self.state = {}
         self.history = []
+    def get_metadata(self, field):
+        return self.document[field]
     def eval_node(self, node_id):
         node = self.story[node_id]
         return eval_root_node(node, self.state)
@@ -159,9 +162,16 @@ quit : Exit game.
 exit : Exit game.
 """
 
-if __name__ == '__main__':
+def story_repl(filename = 'story.json'):
     s = Story()
-    s.load()
+    s.load(filename)
+    print()
+    title = s.get_metadata('title')
+    print(title)
+    print('-'*len(title))
+    print()
+    print("By %s" % (s.get_metadata('author'), ))
+    print()
     s.start()
     while True:
         try:
@@ -174,12 +184,18 @@ if __name__ == '__main__':
             if autoacts and not actables:
                 s.enact(autoacts)
             else:
+                # FIXME: Catch EOFError from Ctrl-d
                 cmd = input('> ')
                 if cmd=="a":
+                    # FIXME: Make sure that autoact exists, otherwise reprompt
                     s.enact(autoacts)
                 else:
+                    # FIXME: Make sure that answer is in range, otherwise reprompt
                     cmd_id = int(cmd)-1
                     s.enact(actables[cmd_id]['result'])
         except StoryExited:
             break
+
+if __name__ == '__main__':
+    story_repl()
 
