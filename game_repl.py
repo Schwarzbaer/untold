@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-# TODO:
-# Consider i18n/l10 and templating
-# Lots of condition improvements
-#   any/all/at-least-n/at-most-n for lists of conditions
-# History and rewind/forward
-
 import json
 from pprint import pprint
 
