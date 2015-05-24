@@ -164,7 +164,7 @@ battle_story = {
                      {'cond': True,
                       'scene': {'text': 'The old woman interrupts her work and turns around, a tired smile on her face. "Hello young man, what brings you this way?"' },
                       'actable': [{'text': 'Nothing.',
-                                   'result': {'goto': 'forest'}, # FIXME
+                                   'result': {'goto': 'roll_credits'}, # FIXME
                                   },
                                   {'text': 'I bring news from the battlefield.',
                                    'result': {'goto': 'forest'}, # FIXME
@@ -175,6 +175,8 @@ battle_story = {
                      },
                     ],
            },
+           {'id': 'roll_credits',
+            'special': 'exit'},
           ],
 }
 #--------------------------------------------------------------------

@@ -138,14 +138,27 @@ class Story:
         node = self.story[node_id]
         return eval_root_node(node, self.state)
     def enact(self, action):
+        # FIXME: This should also take the user choice, so it'll be
+        # easier to actually show actions being rewound/forwarded, not
+        # just state changes being made.
+        changes = [] # List of tuples of (variable, (before, after))
         if 'set' in action:
+            changes.append((action['set']['var'],
+                            (self.state.get(action['set']['var'], None),
+                             action['set']['val'])))
             self.state[action['set']['var']] = action['set']['val']
             # print("set %s to %s" % (action['set']['var'], action['set']['val'],))
+        # FIXME: 'goto' could be merged into 'set', but syntactic
+        # sugar may be nice here?
         if 'goto' in action:
+            changes.append(('current_node',
+                            (self.state['current_node'],
+                             action['goto'])))
             self.state['current_node'] = action['goto']
+        self.history.append(changes)
     # Game Flow
     def start(self):
-        self.enact({'goto': self.document['start_node']})
+        self.state['current_node'] = self.document['start_node']
     def eval_current_node(self):
         return self.eval_node(self.state['current_node'])
 
@@ -199,6 +212,8 @@ def story_repl(filename = 'story.json'):
                         pass # FIXME: Reprompt (list is too long)
                     s.enact(actables[cmd_id]['result'])
         except StoryExited:
+            # FIXME: Remove this print after finishing history logging
+            pprint(s.history)
             break
 
 if __name__ == '__main__':
