@@ -167,49 +167,72 @@ quit : Exit game.
 exit : Exit game.
 """
 
-def story_repl(filename = 'story.json'):
-    s = Story()
-    s.load(filename)
-    print()
-    title = s.get_metadata('title')
-    print(title)
-    print('-'*len(title))
-    print()
-    print("By %s" % (s.get_metadata('author'), ))
-    print()
-    s.start()
-    while True:
-        try:
-            scene, actables, autoacts = s.eval_current_node()
-            if scene:
-                print(scene['text'])
-            if actables:
-                for act_id in range(0, len(actables)):
-                    print("%d) %s" % (act_id+1, actables[act_id]['text']))
-            if autoacts and not actables:
-                s.enact(autoacts)
+class REPL:
+    def __init__(self, filename = 'story.json'):
+        self.repl_commands = ['history']
+        self.story = Story()
+        self.story.load(filename)
+        self.pretext()
+        self.story.start()
+    def pretext(self):
+        print()
+        title = self.story.get_metadata('title')
+        print(title)
+        print('-'*len(title))
+        print()
+        print("By %s" % (self.story.get_metadata('author'), ))
+        print()
+    def repl_command(self, cmd_str):
+        repl_command = cmd_str.split(' ')
+        if repl_command[0] == 'history':
+            if len(repl_command) == 1:
+                print("History so far:")
+                pprint(self.story.history)
             else:
-                # FIXME: Catch EOFError from Ctrl-d
-                cmd = input('> ')
-                if False: # FIXME: REPL functions here
-                    pass
-                elif cmd=="a":
-                    # FIXME: Make sure that autoact exists, otherwise reprompt
-                    s.enact(autoacts)
+                try:
+                    n = int(repl_command[1])
+                    print("Last %d history entries:" % (n, ))
+                    pprint(self.story.history[-n:])
+                except ValueError:
+                    print("Usage: history <n>")
+    def loop(self):
+        while True:
+            try:
+                scene, actables, autoacts = self.story.eval_current_node()
+                if scene:
+                    print(scene['text'])
+                if actables:
+                    for act_id in range(0, len(actables)):
+                        print("%d) %s" % (act_id+1, actables[act_id]['text']))
+                if autoacts and not actables:
+                    self.story.enact(autoacts)
                 else:
-                    try:
-                    # FIXME: Make sure that answer is in range, otherwise reprompt
-                        cmd_id = int(cmd)-1
-                    except ValueError:
-                        pass # FIXME: Reprompt (What was entered wasn't an int)
-                    if cmd_id > len(actables):
-                        pass # FIXME: Reprompt (list is too long)
-                    s.enact(actables[cmd_id]['result'])
-        except StoryExited:
-            # FIXME: Remove this print after finishing history logging
-            pprint(s.history)
-            break
+                    cmd = input('> ')
+                    if len(cmd)>0 and cmd.split(' ')[0] in self.repl_commands:
+                        self.repl_command(cmd)
+                    elif cmd=="a":
+                        # FIXME: Make sure that autoact exists, otherwise reprompt
+                        self.story.enact(autoacts)
+                    else:
+                        try:
+                            # FIXME: Make sure that answer is in range, otherwise reprompt
+                            cmd_id = int(cmd)-1
+                        except ValueError:
+                            pass # FIXME: Reprompt (What was entered wasn't an int)
+                        if cmd_id > len(actables):
+                            pass # FIXME: Reprompt (list is too long)
+                        self.story.enact(actables[cmd_id]['result'])
+            except StoryExited:
+                break
+            except EOFError:
+                # Ctrl-D in input()
+                print()
+                print("See you later, hope you had a good time!")
+                print()
+                break
 
 if __name__ == '__main__':
-    story_repl()
+    repl = REPL()
+    repl.loop()
+    # story_repl()
 
