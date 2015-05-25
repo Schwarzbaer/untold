@@ -124,8 +124,7 @@ class Story:
         self.story = {node['id']: node for node in self.document['story']}
         f.close()
         # Set starting state
-        self.state = {}
-        self.history = []
+        self.state = {'history': []}
     def get_metadata(self, field):
         return self.document[field]
     def eval_node(self, node_id):
@@ -149,7 +148,7 @@ class Story:
                             (self.state['current_node'],
                              action['goto'])))
             self.state['current_node'] = action['goto']
-        self.history.append(changes)
+        self.state['history'].append(changes)
     # Game Flow
     def start(self):
         self.state['current_node'] = self.document['start_node']
@@ -185,14 +184,15 @@ class REPL:
     def repl_command(self, cmd_str):
         repl_command = cmd_str.split(' ')
         if repl_command[0] == 'history':
+            history = self.story.state['history']
             if len(repl_command) == 1:
                 print("History so far:")
-                pprint(self.story.history)
+                pprint(history)
             else:
                 try:
                     n = int(repl_command[1])
                     print("Last %d history entries:" % (n, ))
-                    pprint(self.story.history[-n:])
+                    pprint(history[-n:])
                 except ValueError:
                     print("Usage: history <n>")
     def loop(self):
