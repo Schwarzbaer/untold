@@ -192,7 +192,7 @@ class REPL:
                 try:
                     n = int(repl_command[1])
                     print("Last %d history entries:" % (n, ))
-                    pprint(self.story.history[:-n])
+                    pprint(self.story.history[-n:])
                 except ValueError:
                     print("Usage: history <n>")
     def loop(self):
@@ -226,6 +226,9 @@ class REPL:
                 break
             except EOFError:
                 # Ctrl-D in input()
+                print()
+                print("See you later, hope you had a good time!")
+                print()
                 break
 
         
