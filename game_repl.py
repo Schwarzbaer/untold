@@ -34,7 +34,6 @@ class CaseWithoutActiveCond(Exception):
     pass
 
 def eval_case_node(case_node, state):
-    # FIXME: Find active leaf
     for leaf in case_node['case']:
         condition = leaf['cond']
         if eval_condition(condition, state):
@@ -58,7 +57,6 @@ def node_has_script_elements(node):
 def eval_script_node(node, state):
     cont = node_has_script_elements(node)
     while cont:
-        # print("eval_script_node: %s" % (str(node), ))
         node_tags = set(node.keys())
         tag = next((tag for tag in node_tags if tag in func_tags), False)
         if tag:
@@ -104,7 +102,6 @@ node_funcs = {
 
 def eval_root_node(node, state):
     node = eval_script_node(node, state)
-    # print("eval_root_node %s" % (str(node), ))
     node_func_keys = node_funcs.keys()
     for key in node.keys():
         if key in node_func_keys:
@@ -140,7 +137,6 @@ class Story:
                             (self.state.get(action['set']['var'], None),
                              action['set']['val'])))
             self.state[action['set']['var']] = action['set']['val']
-            # print("set %s to %s" % (action['set']['var'], action['set']['val'],))
         # FIXME: 'goto' could be merged into 'set', but syntactic
         # sugar may be nice here?
         if 'goto' in action:
@@ -234,5 +230,4 @@ class REPL:
 if __name__ == '__main__':
     repl = REPL()
     repl.loop()
-    # story_repl()
 
