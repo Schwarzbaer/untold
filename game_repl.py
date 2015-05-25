@@ -231,57 +231,6 @@ class REPL:
                 print()
                 break
 
-        
-        
-def story_repl(filename = 'story.json'):
-    repl_commands = ['history']
-    s = Story()
-    s.load(filename)
-    print()
-    title = s.get_metadata('title')
-    print(title)
-    print('-'*len(title))
-    print()
-    print("By %s" % (s.get_metadata('author'), ))
-    print()
-    s.start()
-    while True:
-        try:
-            scene, actables, autoacts = s.eval_current_node()
-            if scene:
-                print(scene['text'])
-            if actables:
-                for act_id in range(0, len(actables)):
-                    print("%d) %s" % (act_id+1, actables[act_id]['text']))
-            if autoacts and not actables:
-                s.enact(autoacts)
-            else:
-                # FIXME: Catch EOFError from Ctrl-d
-                cmd = input('> ')
-                if len(cmd)>0 and cmd.split(' ')[0] in repl_commands:
-                    repl_command = cmd.split(' ')
-                    if repl_command[0] == 'history':
-                        if len(repl_command) == 1:
-                            pprint(s.history)
-                        else:
-                            pass # FIXME: Show last n history entries
-                elif cmd=="a":
-                    # FIXME: Make sure that autoact exists, otherwise reprompt
-                    s.enact(autoacts)
-                else:
-                    try:
-                    # FIXME: Make sure that answer is in range, otherwise reprompt
-                        cmd_id = int(cmd)-1
-                    except ValueError:
-                        pass # FIXME: Reprompt (What was entered wasn't an int)
-                    if cmd_id > len(actables):
-                        pass # FIXME: Reprompt (list is too long)
-                    s.enact(actables[cmd_id]['result'])
-        except StoryExited:
-            # FIXME: Remove this print after finishing history logging
-            pprint(s.history)
-            break
-
 if __name__ == '__main__':
     repl = REPL()
     repl.loop()
