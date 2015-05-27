@@ -257,10 +257,6 @@ class REPL:
         while True:
             try:
                 scene, actables, autoacts = self.story.eval_current_node()
-                # FIXME: This should be a REPL command instead:
-                #pprint(scene)
-                #pprint(actables)
-                #pprint(autoacts)
                 if scene:
                     for line in textwrap.wrap(scene['text']):
                         print(line)
@@ -276,6 +272,10 @@ class REPL:
                     elif cmd=="a":
                         # FIXME: Make sure that autoact exists, otherwise reprompt
                         self.story.enact(autoacts)
+                    elif cmd=='?':
+                        pprint(scene)
+                        pprint(actables)
+                        pprint(autoacts)
                     else:
                         try:
                             # FIXME: Make sure that answer is in range, otherwise reprompt
