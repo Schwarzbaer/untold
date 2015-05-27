@@ -2,6 +2,7 @@
 
 import json
 from pprint import pprint
+import textwrap
 import random
 
 # Conditions ---------------------------------------------------------
@@ -261,7 +262,8 @@ class REPL:
                 #pprint(actables)
                 #pprint(autoacts)
                 if scene:
-                    print(scene['text'])
+                    for line in textwrap.wrap(scene['text']):
+                        print(line)
                 if actables:
                     for act_id in range(0, len(actables)):
                         print("%d) %s" % (act_id+1, actables[act_id]['text']))
