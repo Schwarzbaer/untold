@@ -115,15 +115,29 @@ class Story:
     def __init__(self, mode = TEXT_MODE):
         self.mode = mode
     def load(self, filename = 'story.json'):
+        """Load a story. Telling it also requires a state, so start()
+        or load_state() it."""
         # Read story
         f = open(filename, 'r')
         self.document = json.loads(f.read())
         self.story = {node['id']: node for node in self.document['story']}
         f.close()
-        # Set starting state
+    # Session management
+    def load_state(self, filename = 'autosave.json'):
+        f = open(filename, 'r')
+        self.state = json.loads(f.read())
+        f.close()
+    def save_state(self, filename = 'autosave.json'):
+        f = open(filename, 'w')
+        f.write(json.dumps(self.state))
+        f.close()
+    def start(self):
         self.state = {'history': []}
+        self.state['current_node'] = self.document['start_node']
+    # Utility
     def get_metadata(self, field):
         return self.document[field]
+    # Running a session
     def eval_node(self, node_id):
         node = self.story[node_id]
         return eval_root_node(node, self.state)
@@ -146,8 +160,6 @@ class Story:
             self.state['current_node'] = action['goto']
         self.state['history'].append(changes)
     # Game Flow
-    def start(self):
-        self.state['current_node'] = self.document['start_node']
     def eval_current_node(self):
         return self.eval_node(self.state['current_node'])
 
@@ -163,11 +175,17 @@ exit : Exit game.
 """
 
 class REPL:
-    def __init__(self, filename = 'story.json'):
-        self.repl_commands = ['history']
+    def __init__(self, story_file = 'story.json'):
+        self.repl_commands = ['history', 'load', 'save', 'restart']
         self.story = Story()
-        self.story.load(filename)
+        self.story.load(story_file)
         self.pretext()
+        self.story.start()
+    def load_game(self, savegame_file = 'autosave.json'):
+        self.story.load_state()
+    def save_game(self, savegame_file = 'autosave.json'):
+        self.story.save_state()
+    def restart_game(self):
         self.story.start()
     def pretext(self):
         print()
@@ -191,6 +209,12 @@ class REPL:
                     pprint(history[-n:])
                 except ValueError:
                     print("Usage: history <n>")
+        elif repl_command[0] == 'load':
+            self.load_game()
+        elif repl_command[0] == 'save':
+            self.save_game()
+        elif repl_command[0] == 'restart':
+            self.restart_game()
     def loop(self):
         while True:
             try:
