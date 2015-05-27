@@ -73,13 +73,50 @@ test_story = {
             'autoact': {'case': [{'cond': {'var': 'var1',
                                            'val': 1,
                                           },
-                                  'goto': 'done',
+                                  'goto': 'unweighted_choice',
                                  },
                                  {'cond': True,
                                   'goto': 'broken',
                                  },
                                 ],
                        },
+           },
+           {'id': 'unweighted_choice',
+            'choice': [{'scene': {'text': 'Unweighted choice chose foo'},
+                        'autoact': {'goto': 'weighted_choice'},
+                       },
+                       {'scene': {'text': 'Unweighted choice chose bar'},
+                        'autoact': {'goto': 'weighted_choice'},
+                       },
+                       {'scene': {'text': 'Unweighted choice chose baz'},
+                        'autoact': {'goto': 'weighted_choice'},
+                       },
+                      ],
+            
+           },
+# FIXME: This should be equivalent to the one before, but isn't.
+#           {'id': 'unweighted_choice',
+#            'scene': {'choice': [{'text': 'Unweighted choice chose foo'},
+#                                 {'text': 'Unweighted choice chose bar'},
+#                                 {'text': 'Unweighted choice chose baz'},
+#                                ],
+#                      'autoact': {'goto': 'weighted_choice'},
+#                     },
+#           },
+           {'id': 'weighted_choice',
+            'choice': [{'weight': 1,
+                        'scene': {'text': 'Weighted choice chose foo'},
+                        'autoact': {'goto': 'done'},
+                       },
+                       {'weight': 2,
+                        'scene': {'text': 'Weighted choice chose bar'},
+                        'autoact': {'goto': 'done'},
+                       },
+                       {'weight': 3,
+                        'scene': {'text': 'Weighted choice chose baz'},
+                        'autoact': {'goto': 'done'},
+                       },
+                      ],
            },
            {'id': 'done',
             'special': 'exit',
@@ -184,7 +221,7 @@ battle_story = {
 import json
 
 if __name__ == '__main__':
-    story = battle_story
+    story = test_story
     f = open('story.json', 'w')
     f.write(json.dumps(story))
     f.write('\n')

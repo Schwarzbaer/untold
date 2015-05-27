@@ -2,6 +2,7 @@
 
 import json
 from pprint import pprint
+import random
 
 # Conditions ---------------------------------------------------------
 
@@ -43,10 +44,43 @@ def eval_case_node(case_node, state):
             return virt_node
     raise CaseWithoutActiveCond
 
+# CHOICE
+# {choice: [{weights: 1},
+#           {weights: 1}]}
+
+class UnknownWeightType(Exception):
+    pass
+
+def eval_weight(weight_node, state):
+    if type(weight_node) == int:
+        return float(weight_node)
+    elif type(weight_node) == float:
+        return weight_node
+    else:
+        raise UnknownWeightType
+
+def eval_choice_node(choice_node, state):
+    weights = [eval_weight(leaf.get('weight', 1.0), state)
+               for leaf in choice_node['choice']]
+    total_weights = sum(weights)
+    c = random.random()
+    idx = 0
+    w_sum = weights[0] / total_weights
+    # FIXME: This should never run beyond the list elements, but maybe I should try/except it anyway?
+    while w_sum < c:
+        idx += 1
+        w_sum += weights[idx] / total_weights
+    virt_node = choice_node.copy()
+    del virt_node['choice']
+    virt_node.update(choice_node['choice'][idx])
+    # pprint(virt_node)
+    return virt_node
+
 # Managerial
 
 script_funcs = {
     'case': eval_case_node,
+    'choice': eval_choice_node,
 }
 
 func_tags = set(script_funcs.keys())
@@ -89,6 +123,9 @@ def eval_scene_node(node, state):
 class StoryExited(Exception):
     pass
 
+class NodeNotEvaluatable(Exception):
+    pass
+
 def eval_special_node(node, state):
     if node['special'] == 'exit':
         raise StoryExited
@@ -107,7 +144,7 @@ def eval_root_node(node, state):
         if key in node_func_keys:
             return node_funcs[key](node, state)
     # FIXME: Raise exception, as there is no function to handle this node.
-    return False
+    raise NodeNotEvaluatable
 
 # Story management ---------------------------------------------------
 
@@ -219,6 +256,10 @@ class REPL:
         while True:
             try:
                 scene, actables, autoacts = self.story.eval_current_node()
+                # FIXME: This should be a REPL command instead:
+                #pprint(scene)
+                #pprint(actables)
+                #pprint(autoacts)
                 if scene:
                     print(scene['text'])
                 if actables:
