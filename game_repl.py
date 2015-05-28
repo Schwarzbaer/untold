@@ -117,7 +117,10 @@ def eval_scene_node(node, state):
         autoact = eval_script_node(node['autoact'], state)
     else:
         autoact = False
-    return (scene, actable, autoact)
+    # return (scene, actable, autoact)
+    return {'scene': scene,
+            'actable': actable,
+            'autoact': autoact}
 
 # Root nodes ---------------------------------------------------------
 
@@ -254,9 +257,16 @@ class REPL:
         elif repl_command[0] == 'restart':
             self.restart_game()
     def loop(self):
+        skip_eval = False
         while True:
             try:
-                scene, actables, autoacts = self.story.eval_current_node()
+                if not skip_eval:
+                    current_node = self.story.eval_current_node()
+                    scene = current_node.get('scene', False)
+                    actables = current_node.get('actable', False)
+                    autoacts = current_node.get('autoact', False)
+                else:
+                    skip_eval = False
                 if scene:
                     for line in textwrap.wrap(scene['text']):
                         print(line)
@@ -273,9 +283,8 @@ class REPL:
                         # FIXME: Make sure that autoact exists, otherwise reprompt
                         self.story.enact(autoacts)
                     elif cmd=='?':
-                        pprint(scene)
-                        pprint(actables)
-                        pprint(autoacts)
+                        pprint(current_node)
+                        skip_eval = True
                     else:
                         try:
                             # FIXME: Make sure that answer is in range, otherwise reprompt
