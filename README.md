@@ -13,7 +13,6 @@ TODO
 
 * Rewind / Forward
 * Inspecting / Editing of document / current node in the REPL
-* Break Story stuff out of game_repl.py
 * Consider i18n/l10 and templating
 * Conditions
   * any/all/at-least-n/at-most-n for lists of conditions
