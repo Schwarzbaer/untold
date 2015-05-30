@@ -10,14 +10,41 @@ def eval_condition(cond_node, state):
     # {var: varname, val: [value]} # TODO: Both list-in-state-variable and conditional-value can be lists
     # {var: varname, val_gt: value1, val_lt: value2} # TODO
     # {cond_list: [list of conditions]} # TODO
-    if type(cond_node) == bool:
+    if type(cond_node) in [bool, int, float, str]:
         return cond_node
-    var = cond_node['var']
-    val = cond_node['val']
-    if var in state.keys():
-        return val == state[var]
+    # FIXME: This should be folded into the one above, but NoneType
+    # is undefined despite type(None) == NoneType. WTF is going on?
+    elif cond_node == None:
+        return None
+    elif 'const' in cond_node.keys():
+        return cond_node['const']
+    elif 'var' in cond_node.keys():
+        return state.get(cond_node['var'], None)
+    elif 'op' in cond_node.keys():
+        op = cond_node['op']
+        varl = eval_condition(cond_node['varl'], state)
+        varr = eval_condition(cond_node['varr'], state)
+        if op == '==':
+            return varl == varr
+        elif op == '!=':
+            return varl != varr
+        elif op == '<=':
+            return varl <= varr
+        elif op == '>=':
+            return varl >= varr
+        elif op == '<':
+            return varl < varr
+        elif op == '>':
+            return varl > varr
     else:
-        return val == None
+        # This is temporary, until the new syntax is implemented.
+        var = cond_node['var']
+        val = cond_node['val']
+        if var in state.keys():
+            return val == state[var]
+        else:
+            return val == None
+
 
 # Scripting elements -------------------------------------------------
 
