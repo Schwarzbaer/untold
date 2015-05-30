@@ -1,0 +1,23 @@
+* {'const': True}
+* {'const': False}
+* {'var': 'foo'}
+  # True if the state variable is True.
+* {'op': '==',
+   'varl': {'var': 'foo'},
+   'varr': {'const': 23}}
+  # Is the value of the states variable named foo 23?
+* {'op': '==',
+   'varl': {'var': 'foo'},
+   'varr': {'const': None}}
+  # Is foo absent in the state?
+* {'op': '==',
+   'varl': {'op': '==',
+            'varl': {'var': 'foo'},
+            'varr': {'const': True}},
+   'varr': {'op': '==',
+            'varl': {'var': 'bar'},
+            'varr': {'const': False}}}
+  # (foo == True) == (bar == False)
+* Other operators: !=, <, <=, >, >=
+* String operators? ~=?
+* sum, abs, other expressions?
