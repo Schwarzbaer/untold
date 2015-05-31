@@ -1,0 +1,28 @@
+Conditions
+----------
+
+* None, booleans, strings, ints and floats
+  get returned verbatim.
+* {'const': <foo>}
+  returns <foo>
+* {'var': 'foo'}
+  returns the value in the variable foo. None if there is no such variable.
+* {'op': '==',
+   'varl': {<cond1>},
+   'varr': {<cond2>}}
+  returns
+* {'op': '==',
+   'varl': {'var': 'foo'},
+   'varr': {'const': None}}
+  # Is foo absent in the state?
+* {'op': '==',
+   'varl': {'op': '==',
+            'varl': {'var': 'foo'},
+            'varr': {'const': True}},
+   'varr': {'op': '==',
+            'varl': {'var': 'bar'},
+            'varr': {'const': False}}}
+  # (foo == True) == (bar == False)
+* Other operators: !=, <, <=, >, >=
+* String operators? ~=?
+* sum, abs, other expressions?
