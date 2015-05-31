@@ -3,6 +3,9 @@ import random
 
 # Conditions ---------------------------------------------------------
 
+class InvalidCondition(Exception):
+    pass
+
 def eval_condition(cond_node, state):
     # Returns True or False
     # True, False: Return just that
@@ -38,13 +41,7 @@ def eval_condition(cond_node, state):
             return varl > varr
     else:
         # This is temporary, until the new syntax is implemented.
-        var = cond_node['var']
-        val = cond_node['val']
-        if var in state.keys():
-            return val == state[var]
-        else:
-            return val == None
-
+        raise InvalidCondition
 
 # Scripting elements -------------------------------------------------
 
