@@ -1,28 +1,35 @@
+Document Format
+---------------
+
+
+
 Conditions
 ----------
 
-* None, booleans, strings, ints and floats
-  get returned verbatim.
-* {'const': <foo>}
-  returns <foo>
-* {'var': 'foo'}
-  returns the value in the variable foo. None if there is no such variable.
-* {'op': '==',
-   'varl': {<cond1>},
-   'varr': {<cond2>}}
-  returns
-* {'op': '==',
-   'varl': {'var': 'foo'},
-   'varr': {'const': None}}
-  # Is foo absent in the state?
-* {'op': '==',
-   'varl': {'op': '==',
-            'varl': {'var': 'foo'},
-            'varr': {'const': True}},
-   'varr': {'op': '==',
-            'varl': {'var': 'bar'},
-            'varr': {'const': False}}}
-  # (foo == True) == (bar == False)
+Conditions are expressions that allow to write stories that are reactive to the current state of the story. They return a value. Usually, i.e. in a case/cond, it is relevant whether that value is equivalent to a boolean True or False.
+
+* None, booleans, strings, ints and floats get returned verbatim.
+* Constants in the story (will return that value):
+      {'const': <foo>}
+* References to variables (value will be None if variable isn't specified in the state, its value otherwise):
+      {'var': 'foo'}
+* Equality test between two sub-conditions
+      {'op': '==',
+       'varl': {<cond1>},
+       'varr': {<cond2>}}
+* Is foo absent in the state?
+      {'op': '==',
+       'varl': {'var': 'foo'},
+       'varr': {'const': None}}
+* (foo == True) == (bar == False)
+      {'op': '==',
+       'varl': {'op': '==',
+                'varl': {'var': 'foo'},
+                'varr': {'const': True}},
+       'varr': {'op': '==',
+                'varl': {'var': 'bar'},
+                'varr': {'const': False}}}
 * Other operators: !=, <, <=, >, >=
-* String operators? ~=?
-* sum, abs, other expressions?
+* TODO
+  * String operators? ~=?
+  * sum, abs, other expressions?

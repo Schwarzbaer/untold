@@ -1,4 +1,4 @@
-UNTOLD
+Untold
 ======
 
 A little engine to run interactive stories. 
@@ -6,11 +6,16 @@ A little engine to run interactive stories.
 KNOWN BUGS
 ----------
 
-* Evaluation of scripted nodes is lacking 8see FIXME in story_writer.py)
+* Evaluation of scripted nodes is lacking (see FIXME in story_writer.py)
+* Example story is highly buggy due to changes in the scripting syntax
 
 TODO
 ----
 
+* Change scene format to
+      {'scene': {'presentation': <foo>,
+                 'actables': <bar>,
+                 'autoact': <baz>}}
 * Rewind / Forward
 * Inspecting / Editing of document / current node in the REPL
 * Consider i18n/l10 and templating
