@@ -193,8 +193,8 @@ class Story:
         f.write(json.dumps(self.state))
         f.close()
     def start(self):
-        self.state = {'history': []}
-        self.state['current_node'] = self.document['start_node']
+        self.state = {'__history': []}
+        self.state['__current_node'] = self.document['start_node']
     # Utility
     def get_metadata(self, field):
         return self.document[field]
@@ -215,11 +215,11 @@ class Story:
         # FIXME: 'goto' could be merged into 'set', but syntactic
         # sugar may be nice here?
         if 'goto' in action:
-            changes.append(('current_node',
-                            (self.state['current_node'],
+            changes.append(('__current_node',
+                            (self.state['__current_node'],
                              action['goto'])))
-            self.state['current_node'] = action['goto']
-        self.state['history'].append(changes)
+            self.state['__current_node'] = action['goto']
+        self.state['__history'].append(changes)
     # Game Flow
     def eval_current_node(self):
-        return self.eval_node(self.state['current_node'])
+        return self.eval_node(self.state['__current_node'])

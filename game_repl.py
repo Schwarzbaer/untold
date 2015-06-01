@@ -39,7 +39,8 @@ class REPL:
     def repl_command(self, cmd_str):
         repl_command = cmd_str.split(' ')
         if repl_command[0] == 'history':
-            history = self.story.state['history']
+            # FIXME: Story should have an interface to access the history
+            history = self.story.state['__history']
             if len(repl_command) == 1:
                 print("History so far:")
                 pprint(history)
