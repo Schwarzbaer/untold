@@ -18,8 +18,7 @@ exit : Exit game.
 class REPL:
     def __init__(self, story_file = 'story.json'):
         self.repl_commands = ['history', 'load', 'save', 'restart']
-        self.story = Story()
-        self.story.load(story_file)
+        self.story = Story(story_file)
         self.pretext()
         self.story.start()
     def load_game(self, savegame_file = 'autosave.json'):

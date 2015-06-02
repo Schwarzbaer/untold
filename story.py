@@ -173,15 +173,22 @@ def eval_root_node(node, state):
 # Story management ---------------------------------------------------
 
 class Story:
-    def __init__(self, mode = TEXT_MODE):
-        self.mode = mode
+    def __init__(self, story_doc = 'story.json'):
+        if type(story_doc) == str:
+            self.load(story_doc)
+        elif type(story_doc) == dict:
+            self.document = story_doc
+        else:
+            # FIXME: Beautify ths.
+            # No valid document reference has been provided.
+            raise Exception
+        self.story = {node['id']: node for node in self.document['story']}
     def load(self, filename = 'story.json'):
         """Load a story. Telling it also requires a state, so start()
         or load_state() it."""
         # Read story
         f = open(filename, 'r')
         self.document = json.loads(f.read())
-        self.story = {node['id']: node for node in self.document['story']}
         f.close()
     # Session management
     def load_state(self, filename = 'autosave.json'):
@@ -196,6 +203,10 @@ class Story:
         self.state = {'__history': []}
         self.state['__current_node'] = self.document['start_node']
     # Utility
+    def get_state_var(self, field):
+        return self.state[field]
+    def set_state_var(self, field, value):
+        self.state[field] = value
     def get_metadata(self, field):
         return self.document[field]
     # Running a session
