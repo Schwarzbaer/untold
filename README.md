@@ -12,10 +12,21 @@ KNOWN BUGS
 TODO
 ----
 
+#####Immediate changes
+* Change history format to
+      [[{'var': <>,
+         'from': <>,
+         'to': <>},
+        {...}],
+       [...],
+      ]
+* Allow 'set' to have conditions, and lists of conditions, as arguments
 * Change scene format to
       {'scene': {'presentation': <foo>,
                  'actables': <bar>,
                  'autoact': <baz>}}
+
+#####Someday-soon changes
 * Rewind / Forward
 * Inspecting / Editing of document / current node in the REPL
 * Consider i18n/l10 and templating
@@ -26,10 +37,10 @@ TODO
   * choice weights
     * variable-stores values
     * variables-stored values weighted by constants
-  * set: Allow conditions as argument
+    * conditions as weights?
 * Document story syntax (JSON and YAML)
   * ...and remove the stub from story_writer
 * Proper story_writer
   * yaml2json story converter (come on, it's just loads() and dumps())
   * Some syntax checking (re: story syntax)
-
+* Rename conditions to expressions? Formulas?
