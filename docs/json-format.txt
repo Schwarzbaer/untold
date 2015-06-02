@@ -1,7 +1,22 @@
 Document Format
 ---------------
 
-
+* The most minimal story:
+      {'start_node': 'start',
+       'story': [{'id': 'start',
+                  'special': 'exit'}]}
+* Some metadata:
+      {'title': 'Example from the docs',
+       'author': 'TheCheapestPixels'}
+* Typical story node (current state):
+      {'scene': {'text': 'This is the scene as it presents itself.'},
+       'actable': [{'text': 'This is a possible action you can take.',
+                    'result': {'set': {'var': 'foo',
+                                       'val': 23},
+                               'goto': 'target_node'}}],
+       'autoact': {'set': {'var': 'foo',
+                           'val': 23},
+                   'goto': 'target_node'}}
 
 Conditions
 ----------
