@@ -117,6 +117,17 @@ def test_set_state_var_1():
             break
     assert s.get_state_var('foo') == 23
 
+def run_through_story(story_doc):
+    s = Story(story_doc)
+    s.start()
+    while True:
+        try:
+            story_state = s.eval_current_node()
+            s.enact(story_state['autoact'])
+        except StoryExited:
+            break
+    return s
+
 def test_set_state_var_2():
     # Using a condition as value for a set
     story_doc = {'start_node': 'start',
@@ -128,12 +139,20 @@ def test_set_state_var_2():
                                         'goto': 'end'}},
                            {'id': 'end',
                             'special': 'exit'}]}
-    s = Story(story_doc)
-    s.start()
-    while True:
-        try:
-            story_state = s.eval_current_node()
-            s.enact(story_state['autoact'])
-        except StoryExited:
-            break
+    s = run_through_story(story_doc)
     assert s.get_state_var('foo')
+
+def test_story_format_1():
+    story_doc = {'start_node': 'start',
+                 'story': [{'id': 'start',
+                            'scene': {'presentation': 'text'},
+                            'autoact': {'set': {'var': 'foo',
+                                                'val': {'op': '==',
+                                                        'varl': 23,
+                                                        'varr': 23}},
+                                        'goto': 'end'}},
+                           {'id': 'end',
+                            'special': 'exit'}]}
+    s = run_through_story(story_doc)
+    assert s.get_state_var('foo')
+    
