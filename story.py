@@ -204,7 +204,7 @@ class Story:
         self.state['__current_node'] = self.document['start_node']
     # Utility
     def get_state_var(self, field):
-        return self.state[field]
+        return self.state.get(field, None)
     def set_state_var(self, field, value):
         self.state[field] = value
     def get_metadata(self, field):
@@ -219,16 +219,24 @@ class Story:
         # just state changes being made.
         changes = [] # List of tuples of (variable, (before, after))
         if 'set' in action:
-            changes.append((action['set']['var'],
-                            (self.state.get(action['set']['var'], None),
-                             action['set']['val'])))
-            self.state[action['set']['var']] = action['set']['val']
+            if type(action['set']) == list:
+                set_commands = action['set']
+            else:
+                set_commands = [action['set']]
+            for set_command in set_commands:
+                var = set_command['var']
+                old_val = self.get_state_var(set_command['var'])
+                new_val = eval_condition(set_command['val'], self.state)
+                self.set_state_var(var, new_val)
+                changes.append({'var': var,
+                                'from': old_val,
+                                'to': new_val})
         # FIXME: 'goto' could be merged into 'set', but syntactic
         # sugar may be nice here?
         if 'goto' in action:
-            changes.append(('__current_node',
-                            (self.state['__current_node'],
-                             action['goto'])))
+            changes.append({'var': '__current_node',
+                            'from': self.state['__current_node'],
+                            'to': action['goto']})
             self.state['__current_node'] = action['goto']
         self.state['__history'].append(changes)
     # Game Flow

@@ -12,24 +12,19 @@ KNOWN BUGS
 TODO
 ----
 
-#####Immediate changes
-* Change history format to
-      [[{'var': <>,
-         'from': <>,
-         'to': <>},
-        {...}],
-       [...],
-      ]
+#####"As soon as possible"
 * Allow 'set' to have conditions, and lists of conditions, as arguments
 * Change scene format to
       {'scene': {'presentation': <foo>,
                  'actables': <bar>,
                  'autoact': <baz>}}
 
-#####Someday-soon changes
+#####"Someday soon"
 * Rewind / Forward
 * Inspecting / Editing of document / current node in the REPL
-* Consider i18n/l10 and templating
+
+#####"Whenever"
+* Consider i18n/l10n and templating
 * Conditions
   * any/all/at-least-n/at-most-n for lists of conditions
   * Fold conditions and scripting nodes into a uniform system
@@ -44,3 +39,10 @@ TODO
   * yaml2json story converter (come on, it's just loads() and dumps())
   * Some syntax checking (re: story syntax)
 * Rename conditions to expressions? Formulas?
+* Debugging
+  * Improve Exceptions with Node IDs
+  * Catch and ovverride CaseWithoutActiveCond
+* readline interface instead of raw_input()
+  * tab completion
+  * automatic creation of matching parens / node stubs
+  
