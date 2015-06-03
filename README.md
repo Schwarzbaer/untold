@@ -13,7 +13,6 @@ TODO
 ----
 
 #####"As soon as possible"
-* Allow 'set' to have conditions, and lists of conditions, as arguments
 * Change scene format to
       {'scene': {'presentation': <foo>,
                  'actables': <bar>,
