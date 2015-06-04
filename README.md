@@ -17,6 +17,7 @@ TODO
       {'scene': {'presentation': <foo>,
                  'actables': <bar>,
                  'autoact': <baz>}}
+* Turn test_story from story_writer.py into actual tests
 
 #####"Someday soon"
 * Rewind / Forward
@@ -44,4 +45,5 @@ TODO
 * readline interface instead of raw_input()
   * tab completion
   * automatic creation of matching parens / node stubs
+* Add syntax checking to file tools
   
