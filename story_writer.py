@@ -173,12 +173,55 @@ battle_story = {
             'special': 'exit'},
           ],
 }
+
+new_story_format_story = {
+    'author': 'TheCheapestPixels',
+    'title': 'After the Storm',
+    'start_node': 'start',
+    'story': [{'id': 'start',
+               'scene': {'presentation': {'text': 'There are three doors.'},
+                         'actables': [{'text': 'Door foo',
+                                       'result': {'goto': 'foo'}},
+                                      {'text': 'Door bar',
+                                       'result': {'goto': 'bar'}},
+                                      {'text': 'Door baz',
+                                       'result': {'goto': 'baz'}},
+                                      ]}},
+              {'id': 'foo',
+               'scene': {'presentation': {'text': 'There are three doors'},
+                         'actables': [{'text': 'Door bar',
+                                       'result': {'goto': 'bar'}},
+                                      {'text': 'Door baz',
+                                       'result': {'goto': 'baz'}},
+                                      {'text': 'Door exit',
+                                       'result': {'goto': 'exit'}},
+                                      ]}},
+              {'id': 'bar',
+               'scene': {'presentation': {'text': 'There are three doors'},
+                         'actables': [{'text': 'Door foo',
+                                       'result': {'goto': 'foo'}},
+                                      {'text': 'Door baz',
+                                       'result': {'goto': 'baz'}},
+                                      {'text': 'Door exit',
+                                       'result': {'goto': 'exit'}},
+                                      ]}},
+              {'id': 'baz',
+               'scene': {'presentation': {'text': 'There are three doors'},
+                         'actables': [{'text': 'Door foo',
+                                       'result': {'goto': 'foo'}},
+                                      {'text': 'Door bar',
+                                       'result': {'goto': 'bar'}},
+                                      {'text': 'Door exit',
+                                       'result': {'goto': 'exit'}},
+                                      ]}},
+              {'id': 'exit',
+               'special': 'exit'}]}
 #--------------------------------------------------------------------
 
 import json
 
 if __name__ == '__main__':
-    story = test_story
+    story = new_story_format_story
     f = open('story.json', 'w')
     f.write(json.dumps(story))
     f.write('\n')
