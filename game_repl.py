@@ -62,13 +62,13 @@ class REPL:
             try:
                 if not skip_eval:
                     current_node = self.story.eval_current_node()
-                    scene = current_node.get('scene', False)
-                    actables = current_node.get('actable', False)
+                    presentation = current_node.get('presentation', False)
+                    actables = current_node.get('actables', False)
                     autoacts = current_node.get('autoact', False)
                 else:
                     skip_eval = False
-                if scene:
-                    for line in textwrap.wrap(scene['text']):
+                if presentation:
+                    for line in textwrap.wrap(presentation['text']):
                         print(line)
                 if actables:
                     for act_id in range(0, len(actables)):

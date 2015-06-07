@@ -13,10 +13,6 @@ TODO
 ----
 
 #####"As soon as possible"
-* Change scene format to
-      {'scene': {'presentation': <foo>,
-                 'actables': <bar>,
-                 'autoact': <baz>}}
 * Turn test_story from story_writer.py into actual tests
 
 #####"Someday soon"
@@ -41,7 +37,7 @@ TODO
 * Rename conditions to expressions? Formulas?
 * Debugging
   * Improve Exceptions with Node IDs
-  * Catch and ovverride CaseWithoutActiveCond
+  * Catch and override CaseWithoutActiveCond
 * readline interface instead of raw_input()
   * tab completion
   * automatic creation of matching parens / node stubs

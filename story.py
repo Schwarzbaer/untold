@@ -125,21 +125,20 @@ TEXT_MODE = 1
 # Scene nodes --------------------------------------------------------
 
 def eval_scene_node(node, state):
-    if 'scene' in node.keys():
-        scene = eval_script_node(node['scene'], state)
+    if 'presentation' in node['scene'].keys():
+        presentation = eval_script_node(node['scene']['presentation'], state)
     else:
-        scene = False
-    if 'actable' in node.keys():
-        actable = eval_script_node(node['actable'], state)
+        presentation = False
+    if 'actables' in node['scene'].keys():
+        actables = eval_script_node(node['scene']['actables'], state)
     else:
-        actable = False
-    if 'autoact' in node.keys():
-        autoact = eval_script_node(node['autoact'], state)
+        actables = False
+    if 'autoact' in node['scene'].keys():
+        autoact = eval_script_node(node['scene']['autoact'], state)
     else:
         autoact = False
-    # return (scene, actable, autoact)
-    return {'scene': scene,
-            'actable': actable,
+    return {'presentation': presentation,
+            'actables': actables,
             'autoact': autoact}
 
 # Root nodes ---------------------------------------------------------
@@ -156,11 +155,14 @@ def eval_special_node(node, state):
 
 node_funcs = {
     'scene': eval_scene_node,
-    'actable': eval_scene_node,
-    'autoact': eval_scene_node,
     'special': eval_special_node,
 }
 
+# Check the nodes keywords against the functions that handle nodes
+# with those keywords. Actually, one matching function will be chosen
+# at pseudo-random (order of hashing) and its result will be
+# returned. Thus each story node should have only exactly one keyword
+# that is applicable here. 
 def eval_root_node(node, state):
     node = eval_script_node(node, state)
     node_func_keys = node_funcs.keys()
