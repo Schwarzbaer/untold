@@ -102,9 +102,9 @@ def test_nesting_3():
 def test_set_state_var_1():
     story_doc = {'start_node': 'start',
                  'story': [{'id': 'start',
-                            'autoact': {'set': {'var': 'foo',
-                                                'val': 23},
-                                        'goto': 'end'}},
+                            'scene': {'autoact': {'set': {'var': 'foo',
+                                                          'val': 23},
+                                                  'goto': 'end'}}},
                            {'id': 'end',
                             'special': 'exit'}]}
     s = Story(story_doc)
@@ -132,11 +132,11 @@ def test_set_state_var_2():
     # Using a condition as value for a set
     story_doc = {'start_node': 'start',
                  'story': [{'id': 'start',
-                            'autoact': {'set': {'var': 'foo',
-                                                'val': {'op': '==',
-                                                        'varl': 23,
-                                                        'varr': 23}},
-                                        'goto': 'end'}},
+                            'scene': {'autoact': {'set': {'var': 'foo',
+                                                          'val': {'op': '==',
+                                                                  'varl': 23,
+                                                                  'varr': 23}},
+                                                  'goto': 'end'}}},
                            {'id': 'end',
                             'special': 'exit'}]}
     s = run_through_story(story_doc)
@@ -145,14 +145,31 @@ def test_set_state_var_2():
 def test_story_format_1():
     story_doc = {'start_node': 'start',
                  'story': [{'id': 'start',
-                            'scene': {'presentation': 'text'},
-                            'autoact': {'set': {'var': 'foo',
-                                                'val': {'op': '==',
-                                                        'varl': 23,
-                                                        'varr': 23}},
-                                        'goto': 'end'}},
+                            'scene': {'presentation': 'text',
+                                      'autoact': {'set': {'var': 'foo',
+                                                          'val': {'op': '==',
+                                                                  'varl': 23,
+                                                                  'varr': 23}},
+                                                  'goto': 'end'}}},
                            {'id': 'end',
                             'special': 'exit'}]}
     s = run_through_story(story_doc)
     assert s.get_state_var('foo')
-    
+
+def test_if_node_1():
+    story_doc = {'start_node': 'start',
+                 'story': [{'id': 'start',
+                            'case': [{'if': False,
+                                      'cond': True,
+                                      'scene': {'autoact': {'set': {'var': 'foo',
+                                                                    'val': {'const': False}},
+                                                            'goto': 'end'}}},
+                                     {'if': True,
+                                      'cond': True,
+                                      'scene': {'autoact': {'set': {'var': 'foo',
+                                                                    'val': {'const': True}},
+                                                            'goto': 'end'}}}]},
+                           {'id': 'end',
+                            'special': 'exit'}]}
+    s = run_through_story(story_doc)
+    assert s.get_state_var('foo')

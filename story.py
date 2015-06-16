@@ -45,6 +45,23 @@ def eval_condition(cond_node, state):
 
 # Scripting elements -------------------------------------------------
 
+# Common features of list-bearing keywords, specifically:
+# IF
+
+def eval_list_node(node_list, state):
+    virt_list = []
+    for list_node in node_list:
+        if 'if' in list_node.keys():
+            cond_node = list_node['if']
+            if eval_condition(cond_node, state):
+                virt_list.append(list_node)
+            else:
+                pass
+        else:
+            # No 'if' keyword encountered
+            virt_list.append(list_node)
+    return virt_list
+
 # CASE structure
 # {case: [{cond: True, foo: 1}],
 #  bar: 1}
@@ -56,7 +73,8 @@ class CaseWithoutActiveCond(Exception):
     pass
 
 def eval_case_node(case_node, state):
-    for leaf in case_node['case']:
+    options = eval_list_node(case_node['case'], state)
+    for leaf in options:
         condition = leaf['cond']
         if eval_condition(condition, state):
             virt_node = case_node.copy()
@@ -81,8 +99,9 @@ def eval_weight(weight_node, state):
         raise UnknownWeightType
 
 def eval_choice_node(choice_node, state):
+    options = eval_list_node(choice_node['choice'], state)
     weights = [eval_weight(leaf.get('weight', 1.0), state)
-               for leaf in choice_node['choice']]
+               for leaf in options]
     total_weights = sum(weights)
     c = random.random()
     idx = 0
@@ -130,7 +149,7 @@ def eval_scene_node(node, state):
     else:
         presentation = False
     if 'actables' in node['scene'].keys():
-        actables = eval_script_node(node['scene']['actables'], state)
+        actables = eval_script_node(eval_list_node(node['scene']['actables'], state), state)
     else:
         actables = False
     if 'autoact' in node['scene'].keys():
@@ -147,7 +166,10 @@ class StoryExited(Exception):
     pass
 
 class NodeNotEvaluatable(Exception):
-    pass
+    def __init__(self, node):
+        self.node = node
+    def __str__(self):
+        return repr(self.node)
 
 def eval_special_node(node, state):
     if node['special'] == 'exit':
@@ -170,7 +192,7 @@ def eval_root_node(node, state):
         if key in node_func_keys:
             return node_funcs[key](node, state)
     # FIXME: Raise exception, as there is no function to handle this node.
-    raise NodeNotEvaluatable
+    raise NodeNotEvaluatable(node)
 
 # Story management ---------------------------------------------------
 
