@@ -1,5 +1,6 @@
 import json
 import random
+from pprint import pprint
 
 # Conditions ---------------------------------------------------------
 
@@ -144,6 +145,11 @@ TEXT_MODE = 1
 # Scene nodes --------------------------------------------------------
 
 def eval_scene_node(node, state):
+    print("|| Node before scene script evaluation")
+    pprint(node)
+    node = eval_script_node(node, state)
+    print("|| Node after scene script evaluation")
+    pprint(node)
     if 'presentation' in node['scene'].keys():
         presentation = eval_script_node(node['scene']['presentation'], state)
     else:
@@ -191,10 +197,13 @@ def eval_root_node(node, state):
     for key in node.keys():
         if key in node_func_keys:
             return node_funcs[key](node, state)
-    # FIXME: Raise exception, as there is no function to handle this node.
+    # Raise exception, as there is no function to handle this node.
     raise NodeNotEvaluatable(node)
 
 # Story management ---------------------------------------------------
+
+class NoSuchMetadata(Exception):
+    pass
 
 class Story:
     def __init__(self, story_doc = 'story.json'):
@@ -206,7 +215,9 @@ class Story:
             # FIXME: Beautify ths.
             # No valid document reference has been provided.
             raise Exception
+        # FIXME: Wrap this in a try block, as stories may be malformed.
         self.story = {node['id']: node for node in self.document['story']}
+
     def load(self, filename = 'story.json'):
         """Load a story. Telling it also requires a state, so start()
         or load_state() it."""
@@ -214,29 +225,41 @@ class Story:
         f = open(filename, 'r')
         self.document = json.loads(f.read())
         f.close()
+
     # Session management
     def load_state(self, filename = 'autosave.json'):
         f = open(filename, 'r')
         self.state = json.loads(f.read())
         f.close()
+
     def save_state(self, filename = 'autosave.json'):
         f = open(filename, 'w')
         f.write(json.dumps(self.state))
         f.close()
+
     def start(self):
         self.state = {'__history': []}
         self.state['__current_node'] = self.document['start_node']
+
     # Utility
+
     def get_state_var(self, field):
         return self.state.get(field, None)
+
     def set_state_var(self, field, value):
         self.state[field] = value
+    
     def get_metadata(self, field):
-        return self.document[field]
+        try:
+            return self.document[field]
+        except KeyError:
+            raise NoSuchMetadata
+    
     # Running a session
     def eval_node(self, node_id):
         node = self.story[node_id]
         return eval_root_node(node, self.state)
+    
     def enact(self, action):
         # FIXME: This should also take the user choice, so it'll be
         # easier to actually show actions being rewound/forwarded, not
@@ -263,6 +286,8 @@ class Story:
                             'to': action['goto']})
             self.state['__current_node'] = action['goto']
         self.state['__history'].append(changes)
+
     # Game Flow
+
     def eval_current_node(self):
         return self.eval_node(self.state['__current_node'])

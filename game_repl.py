@@ -2,7 +2,7 @@
 
 from pprint import pprint
 import textwrap
-from story import Story, StoryExited
+from story import Story, StoryExited, NoSuchMetadata
 
 # REPL ---------------------------------------------------------------
 
@@ -28,13 +28,20 @@ class REPL:
     def restart_game(self):
         self.story.start()
     def pretext(self):
-        print()
-        title = self.story.get_metadata('title')
-        print(title)
-        print('-'*len(title))
-        print()
-        print("By %s" % (self.story.get_metadata('author'), ))
-        print()
+        try:
+            title = self.story.get_metadata('title')
+            print()
+            print(title)
+            print('-'*len(title))
+            print()
+        except NoSuchMetadata:
+            pass
+        try:
+            print("By %s" % (self.story.get_metadata('author'), ))
+            print()
+        except NoSuchMetadata:
+            pass
+
     def repl_command(self, cmd_str):
         repl_command = cmd_str.split(' ')
         if repl_command[0] == 'history':
@@ -56,7 +63,8 @@ class REPL:
             self.save_game()
         elif repl_command[0] == 'restart':
             self.restart_game()
-    def loop(self):
+            
+    def loop(self, debug = True):
         skip_eval = False
         while True:
             try:
@@ -65,6 +73,15 @@ class REPL:
                     presentation = current_node.get('presentation', False)
                     actables = current_node.get('actables', False)
                     autoacts = current_node.get('autoact', False)
+                    if debug:
+                        print()
+                        print("-- Current node (pre-evaluation):")
+                        pprint(self.story.story[self.story.state['__current_node']])
+                        print("-- Current node (post-evaluation):")
+                        pprint(current_node)
+                        print("-- Current story state:")
+                        pprint(self.story.state)
+                        print()
                 else:
                     skip_eval = False
                 if presentation:
@@ -95,6 +112,7 @@ class REPL:
                             pass # FIXME: Reprompt (list is too long)
                         self.story.enact(actables[cmd_id]['result'])
             except StoryExited:
+                print("Story has ended.")
                 break
             except EOFError:
                 # Ctrl-D in input()

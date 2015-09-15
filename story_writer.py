@@ -217,11 +217,48 @@ new_story_format_story = {
               {'id': 'exit',
                'special': 'exit'}]}
 #--------------------------------------------------------------------
+choice_test_story = {'start_node': 'start',
+                     'story': [{'id': 'start',
+                                'scene': {'presentation': {'text': 'Start node'},
+                                          'autoact': {'goto': 'loop',
+                                                      'set': {'var': 'var1',
+                                                              'val': 0,
+                                                              },
+                                                      },
+                                          }
+                                },
+                               {'id': 'loop',
+                                'scene': {'case': [{'cond': {'op': '==',
+                                                             'varl': {'var': 'counter'},
+                                                             'varr': 0,
+                                                             },
+                                                    'presentation': {'text': 'Loop node'},
+                                                    'autoact': {'goto': 'loop',
+                                                                'set': {'var': 'var1',
+                                                                        'val': 5,
+                                                                        },
+                                                                },
+                                                    },
+                                                   {'cond': {'op': '==',
+                                                             'varl': {'var': 'counter'},
+                                                             'varr': 5,
+                                                             },
+                                                    'presentation': {'text': 'End of Loop node'},
+                                                    'autoact': {'goto': 'exit'},
+                                                    },
+                                                   ],
+                                          },
+                                },
+                               {'id': 'exit',
+                                'special': 'exit',
+                                }],
+                     }
+#--------------------------------------------------------------------
 
 import json
 
 if __name__ == '__main__':
-    story = new_story_format_story
+    story = choice_test_story
     f = open('story.json', 'w')
     f.write(json.dumps(story))
     f.write('\n')
