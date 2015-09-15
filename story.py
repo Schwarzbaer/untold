@@ -145,21 +145,22 @@ TEXT_MODE = 1
 # Scene nodes --------------------------------------------------------
 
 def eval_scene_node(node, state):
-    print("|| Node before scene script evaluation")
-    pprint(node)
-    node = eval_script_node(node, state)
-    print("|| Node after scene script evaluation")
-    pprint(node)
-    if 'presentation' in node['scene'].keys():
-        presentation = eval_script_node(node['scene']['presentation'], state)
+    # FIXME: What to do about this debugging code?
+    # print("|| Node before scene script evaluation")
+    # pprint(node['scene'])
+    scene_node = eval_script_node(node['scene'], state)
+    # print("|| Node after scene script evaluation")
+    # pprint(scene_node)
+    if 'presentation' in scene_node.keys():
+        presentation = eval_script_node(scene_node['presentation'], state)
     else:
         presentation = False
-    if 'actables' in node['scene'].keys():
-        actables = eval_script_node(eval_list_node(node['scene']['actables'], state), state)
+    if 'actables' in scene_node.keys():
+        actables = eval_script_node(eval_list_node(scene_node['actables'], state), state)
     else:
         actables = False
-    if 'autoact' in node['scene'].keys():
-        autoact = eval_script_node(node['scene']['autoact'], state)
+    if 'autoact' in scene_node.keys():
+        autoact = eval_script_node(scene_node['autoact'], state)
     else:
         autoact = False
     return {'presentation': presentation,

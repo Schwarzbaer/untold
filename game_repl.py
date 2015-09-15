@@ -64,7 +64,7 @@ class REPL:
         elif repl_command[0] == 'restart':
             self.restart_game()
             
-    def loop(self, debug = True):
+    def loop(self, debug = False):
         skip_eval = False
         while True:
             try:
