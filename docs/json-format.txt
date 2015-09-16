@@ -1,3 +1,14 @@
+Basic Workcycle
+---------------
+
+* Basic workcycle
+  * Untold generates a dict of presentation, actables (list of Actions) and
+    autoacts (an Action to take if the user doesn't act) for the frontend to
+    present to the user.
+  * The frontend passes the selected Action to Untold to enact.
+  * This continues until the story ends due to a special exit node, at which
+    point StoryExited is raised.
+
 Document Format
 ---------------
 
@@ -5,18 +16,26 @@ Document Format
       {'start_node': 'start',
        'story': [{'id': 'start',
                   'special': 'exit'}]}
-* Some metadata:
+* ...with some more metadata:
       {'title': 'Example from the docs',
-       'author': 'TheCheapestPixels'}
-* Typical story node (current state):
-      {'scene': {'text': 'This is the scene as it presents itself.'},
-       'actable': [{'text': 'This is a possible action you can take.',
-                    'result': {'set': {'var': 'foo',
-                                       'val': 23},
-                               'goto': 'target_node'}}],
-       'autoact': {'set': {'var': 'foo',
-                           'val': 23},
-                   'goto': 'target_node'}}
+       'author': 'TheCheapestPixels',
+       'start_node': 'start',
+       'story': [{'id': 'start',
+                  'special': 'exit'}]}
+* Typical story node:
+      {'scene': {'presentation': {'text': 'This is the scene as it presents itself.'},
+                 'actable': [{'text': 'This is a possible action you can take.',
+                              'result': {'set': {'var': 'foo',
+                                                 'val': 17},
+                                         'goto': 'target_node'}}],
+                 'autoact': {'set': {'var': 'foo',
+                                     'val': 23},
+                             'goto': 'target_node'}}}
+* ...because
+  * STORY has a list of nodes with nodes with either 'scene' (SCENE) or 'süecial'
+  * SCENE nodes contain an optional presentation (?), and 'actable' (ACTION) and/or 'autoact' (ACTION)
+  * ACTION nodes contain 'set' and/or 'goto'
+
 
 Scripting Elements
 ------------------
