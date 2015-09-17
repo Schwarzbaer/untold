@@ -3,6 +3,15 @@ Untold
 
 A little engine to run interactive stories. 
 
+DEVELOPMENT HINTS
+-----------------
+
+* Instead of manipulating nodes directly, always create referential copies
+  instead. Later evaluations of the same node might have to create different
+  evaluations of them.
+* When implementing tags that take lists at argument, process those with
+  untold.scripting.eval_list_node(node_list, state) before proceeding.
+
 KNOWN BUGS
 ----------
 
@@ -13,7 +22,6 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* Write full-story tests
 * Add expressions (and tests)
 * 'set' should take, exclusive-or to 'val', an 'expr' expression.
 * Consider i18n/l10n and templating

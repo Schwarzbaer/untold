@@ -1,4 +1,4 @@
-from template import template_lookup, render
+from untold.template import template_lookup, render
 
 def test_1():
     test_template = {'text': "This is %s, this is only %s, if this was %s they would have given us %s.",

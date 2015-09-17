@@ -1,4 +1,4 @@
-from story import Story, StoryExited
+from untold.story import Story, StoryExited
 
 def run_through_story(story_doc, catch_exit = True):
     s = Story(story_doc)
