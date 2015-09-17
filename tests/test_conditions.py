@@ -1,4 +1,5 @@
 from story import eval_condition, Story, StoryExited
+from tests.util import run_through_story
 
 def test_const_1():
     cond_node = {'const': True}
@@ -116,17 +117,6 @@ def test_set_state_var_1():
         except StoryExited:
             break
     assert s.get_state_var('foo') == 23
-
-def run_through_story(story_doc):
-    s = Story(story_doc)
-    s.start()
-    while True:
-        try:
-            story_state = s.eval_current_node()
-            s.enact(story_state['autoact'])
-        except StoryExited:
-            break
-    return s
 
 def test_set_state_var_2():
     # Using a condition as value for a set

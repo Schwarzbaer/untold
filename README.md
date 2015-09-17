@@ -13,11 +13,12 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
+* Write full-story tests
+* Add expressions (and tests)
+* 'set' should take, exclusive-or to 'val', an 'expr' expression.
 * Consider i18n/l10n and templating
-* Turn test_story from story_writer.py into actual tests
 
 #### Language features
-* 'set' should take, exclusive-or to 'val', an 'expr' expression.
 * choice-f (once a choice is made, it gets stored)
 * 'in' operator
 * select, select-f: Select n elements (weighted?) from a list
