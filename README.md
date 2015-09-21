@@ -22,7 +22,7 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* Maybe merge expressions into conditions, as conditions are just boolean expressions?
+* Merge expressions into conditions, as conditions are just boolean-producing expressions
 * test for choice-f (depends on expr)
 * Rewrite scripting.eval_script_node(), because it's a mess!
 * 'in' operator
@@ -37,7 +37,7 @@ TODO
 * Rewind / Forward
 
 ##### REPL features
-* Inspecting / Editing of document / current node
+* Inspecting / Editing of document / current node / current state
 * readline interface instead of raw_input()
   * tab completion
   * automatic creation of matching parens / node stubs
@@ -48,6 +48,7 @@ TODO
   * Some syntax checking (re: story syntax)
 * Syntax checker
   * Warnings when multiple evaluatable keys are used in root nodes
+* Web-based story authoring / debugging / publishing tool
 
 ##### Minor enhancements
 * Conditions
@@ -58,7 +59,6 @@ TODO
     * variable-stores values
     * variables-stored values weighted by constants
     * conditions as weights?
-* Rename conditions to expressions? Formulas?
 * Debugging
   * Improve Exceptions with Node IDs
   * Catch and override CaseWithoutActiveCond
