@@ -9,16 +9,20 @@ from conditions import eval_condition
 
 def eval_list_node(node_list, state):
     virt_list = []
+    idx = -1
     for list_node in node_list:
-        if 'if' in list_node.keys():
-            cond_node = list_node['if']
+        idx += 1
+        virt_node = list_node.copy()
+        virt_node.update({'_idx': idx})
+        if 'if' in virt_node.keys():
+            cond_node = virt_node['if']
             if eval_condition(cond_node, state):
-                virt_list.append(list_node)
+                virt_list.append(virt_node)
             else:
                 pass
         else:
             # No 'if' keyword encountered
-            virt_list.append(list_node)
+            virt_list.append(virt_node)
     return virt_list
 
 # CASE structure
@@ -43,8 +47,8 @@ def eval_case_node(case_node, state):
     raise CaseWithoutActiveCond
 
 # CHOICE
-# {choice: [{weights: 1},
-#           {weights: 1}]}
+# {choice: [{weight: 1},
+#           {weight: 1}]}
 
 class UnknownWeightType(Exception):
     pass
@@ -74,6 +78,39 @@ def eval_choice_node(choice_node, state):
     virt_node.update(choice_node['choice'][idx])
     # pprint(virt_node)
     return virt_node
+
+# CHOICE-F
+# {choice-f: {storage: foobarbaz,
+#             choices: [{weight: 1},
+#                       {weight: 1}]}
+
+def eval_choice_f_node(choice_f_node, state):
+    storage = choice_f_node['storage']
+    if state.get(storage, None) != None:
+        choice_idx = state.get(storage)
+        virt_node = choice_f_node['choices']
+        del virt_node['choice-f']
+        virt_node.update(choice_f_node['choice-f']['choices'][choice_idx])
+        # pprint(virt_node)
+        return virt_node
+    else:
+        options = eval_list_node(choice_f_node['choice-f']['choices'], state)
+        weights = [eval_weight(leaf.get('weight', 1.0), state)
+                   for leaf in options]
+        total_weights = sum(weights)
+        c = random.random()
+        idx = 0
+        w_sum = weights[0] / total_weights
+        # FIXME: This should never run beyond the list elements, but maybe I should try/except it anyway?
+        while w_sum < c:
+            idx += 1
+            w_sum += weights[idx] / total_weights
+        virt_node = choice_f_node.copy()
+        del virt_node['choice-f']
+        virt_node.update(choice_f_node['choice-f']['choices'][idx])
+        state[storage] = virt_node['_idx']
+        # pprint(virt_node)
+        return virt_node
 
 # Managerial
 

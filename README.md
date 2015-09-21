@@ -22,14 +22,16 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* Add expressions (and tests)
+* Maybe merge expressions into conditions, as conditions are just boolean expressions?
+* test for choice-f (depends on expr)
+* Rewrite scripting.eval_script_node(), because it's a mess!
+* 'in' operator
+* select, select-f: Select n elements (weighted?) from a list
 * 'set' should take, exclusive-or to 'val', an 'expr' expression.
+* choice: A weight should be able to take an expression
 * Consider i18n/l10n and templating
 
 #### Language features
-* choice-f (once a choice is made, it gets stored)
-* 'in' operator
-* select, select-f: Select n elements (weighted?) from a list
 
 ##### Gameplay features
 * Rewind / Forward
@@ -60,6 +62,9 @@ TODO
 * Debugging
   * Improve Exceptions with Node IDs
   * Catch and override CaseWithoutActiveCond
+* Add typechecking everywhere applicable
+      from types import *
+      assert foo is IntType, "foo is %s, not Int" % (type(foo), )
 
 ##### Documentation
 * Story syntax (JSON and YAML)

@@ -2,6 +2,7 @@ import json
 from pprint import pprint
 
 from conditions import eval_condition
+from expressions import eval_expression
 from scripting import eval_script_node, eval_list_node
 
 # Scene nodes --------------------------------------------------------

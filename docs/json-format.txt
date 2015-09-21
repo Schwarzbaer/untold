@@ -31,10 +31,20 @@ Document Format
                  'autoact': {'set': {'var': 'foo',
                                      'val': 23},
                              'goto': 'target_node'}}}
-* ...because
-  * STORY has a list of nodes with nodes with either 'scene' (SCENE) or 'süecial'
-  * SCENE nodes contain an optional presentation (?), and 'actable' (ACTION) and/or 'autoact' (ACTION)
-  * ACTION nodes contain 'set' and/or 'goto'
+* "Formal" structure
+  * Notation
+    * ~X: should be reducable to X by running it through script/expression
+      evaluation.
+    * foo.X: foo is of type X.
+    * .X: Something of type X.
+  * Language
+    * DOCUMENT: METADATA, STORY
+    * STORY: ~[SCENE | SPECIAL]
+    * SPECIAL: exit
+    * SCENE: {presentation: ~PRESENTATION, actable: ~[ACTION], autoact: ~ACTION}
+    * ACTION: set: {var: name, val: ~VALUE}, goto: ~VALUE.str
+    * PRESENTATION: text: text.str
+    * VALUE: .str, .float, .int, .bool
 
 
 Scripting Elements
