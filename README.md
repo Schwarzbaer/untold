@@ -28,6 +28,7 @@ TODO
 * 'in' operator
 * select, select-f: Select n elements (weighted?) from a list
 * 'set' should take, exclusive-or to 'val', an 'expr' expression.
+* 'set' should have explicit timing; several consecutive steps of parallel computations.
 * choice: A weight should be able to take an expression
 * Consider i18n/l10n and templating
 

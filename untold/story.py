@@ -1,9 +1,7 @@
 import json
 from pprint import pprint
 
-from conditions import eval_condition
-from expressions import eval_expression
-from scripting import eval_script_node, eval_list_node
+from scripting import eval_script_node, eval_list_node, eval_expression
 
 # Scene nodes --------------------------------------------------------
 
@@ -137,7 +135,7 @@ class Story:
             for set_command in set_commands:
                 var = set_command['var']
                 old_val = self.get_state_var(set_command['var'])
-                new_val = eval_condition(set_command['val'], self.state)
+                new_val = eval_expression(set_command['val'], self.state)
                 self.set_state_var(var, new_val)
                 changes.append({'var': var,
                                 'from': old_val,

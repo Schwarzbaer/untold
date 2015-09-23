@@ -2,6 +2,121 @@ import random
 
 from conditions import eval_condition
 
+# Expressions --------------------------------------------------------
+
+class InvalidExpression(Exception):
+    def __init__(self, supplementary = "", expr = ""):
+        self.supplementary = supplementary
+        self.expr = expr
+        
+    def __str__(self):
+        return repr(self.expr)
+
+class InvalidOperator(Exception):
+    pass
+
+class InvalidArgument(Exception):
+    def __init__(self, arg = ""):
+        self.arg = arg
+        
+    def __str__(self):
+        return repr(self.arg)
+
+def is_base_type(val):
+    return type(val) in [bool, float, int, str]
+
+# -------------------------------------------------------------------
+
+def expr_const(arg, state):
+    return arg
+
+def expr_get(arg, state):
+    try:
+        return state[arg]
+    except KeyError:
+        raise InvalidArgument(arg)
+
+def expr_get_n(argl, argr, state):
+    try:
+        l = state[argl]
+        if type(l) != list:
+            raise InvalidOperator
+        else:
+            return l[argr]
+    except KeyError:
+        raise InvalidArgument
+
+def expr_plus(argl, argr, state):
+    if not type(argl) in [int, float]:
+        raise InvalidArgument
+    if not type(argr) in [int, float]:
+        raise InvalidArgument
+    return argl + argr
+
+def expr_equal(argl, argr, state):
+    return argl == argr
+
+def expr_unequal(argl, argr, state):
+    return argl != argr
+
+def expr_smaller(argl, argr, state):
+    return argl < argr
+
+def expr_smaller_equal(argl, argr, state):
+    return argl <= argr
+
+def expr_larger(argl, argr, state):
+    return argl > argr
+
+def expr_larger_equal(argl, argr, state):
+    return argl >= argr
+
+def expr_or(argl, argr, state):
+    return argl or argr
+
+def expr_and(argl, argr, state):
+    return argl and argr
+
+expr_unary_operators = {
+    'const': expr_const,
+    'get': expr_get,
+    }
+
+expr_binary_operators = {
+    'get-n': expr_get_n,
+    '+': expr_plus,
+    '==': expr_equal,
+    '!=': expr_unequal,
+    '<': expr_smaller,
+    '<=': expr_smaller_equal,
+    '>': expr_larger,
+    '>=': expr_larger_equal,
+    'or': expr_or,
+    'and': expr_and,
+    }
+
+def eval_expression(expr_node, state):
+    if is_base_type(expr_node):
+        return expr_node
+    virt_node = eval_script_node(expr_node, state)
+    if type(virt_node) == dict:
+        try:
+            operator = virt_node['op']
+            if operator in expr_unary_operators.keys():
+                arg = eval_expression(virt_node['var'], state)
+                return expr_unary_operators[operator](arg, state)
+            elif operator in expr_binary_operators.keys():
+                argl = eval_expression(virt_node['varl'], state)
+                argr = eval_expression(virt_node['varr'], state)
+                res = expr_binary_operators[operator](argl, argr, state)
+                return res
+            else:
+                raise InvalidOperator
+        except KeyError:
+            raise InvalidExpression(expr_node)
+    else:
+        raise InvalidExpression(expr_node)
+
 # Scripting elements -------------------------------------------------
 
 # Common features of list-bearing keywords, specifically:
@@ -16,7 +131,7 @@ def eval_list_node(node_list, state):
         virt_node.update({'_idx': idx})
         if 'if' in virt_node.keys():
             cond_node = virt_node['if']
-            if eval_condition(cond_node, state):
+            if eval_expression(cond_node, state):
                 virt_list.append(virt_node)
             else:
                 pass
@@ -39,7 +154,7 @@ def eval_case_node(case_node, state):
     options = eval_list_node(case_node['case'], state)
     for leaf in options:
         condition = leaf['cond']
-        if eval_condition(condition, state):
+        if eval_expression(condition, state):
             virt_node = case_node.copy()
             del virt_node['case']
             virt_node.update(leaf)
@@ -85,13 +200,12 @@ def eval_choice_node(choice_node, state):
 #                       {weight: 1}]}
 
 def eval_choice_f_node(choice_f_node, state):
-    storage = choice_f_node['storage']
+    storage = choice_f_node['choice-f']['storage']
     if state.get(storage, None) != None:
         choice_idx = state.get(storage)
-        virt_node = choice_f_node['choices']
+        virt_node = choice_f_node.copy()
         del virt_node['choice-f']
-        virt_node.update(choice_f_node['choice-f']['choices'][choice_idx])
-        # pprint(virt_node)
+        virt_node.update(choice_f_node['choice-f']['choices'][choice_idx].copy())
         return virt_node
     else:
         options = eval_list_node(choice_f_node['choice-f']['choices'], state)
@@ -106,8 +220,9 @@ def eval_choice_f_node(choice_f_node, state):
             idx += 1
             w_sum += weights[idx] / total_weights
         virt_node = choice_f_node.copy()
+        #print(virt_node)
         del virt_node['choice-f']
-        virt_node.update(choice_f_node['choice-f']['choices'][idx])
+        virt_node.update(options[idx])
         state[storage] = virt_node['_idx']
         # pprint(virt_node)
         return virt_node
@@ -117,6 +232,7 @@ def eval_choice_f_node(choice_f_node, state):
 script_funcs = {
     'case': eval_case_node,
     'choice': eval_choice_node,
+    'choice-f': eval_choice_f_node,
 }
 
 func_tags = set(script_funcs.keys())

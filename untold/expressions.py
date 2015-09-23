@@ -1,13 +1,23 @@
 from untold.scripting import eval_script_node
 
 class InvalidExpression(Exception):
-    pass
+    def __init__(self, supplementary = "", expr = ""):
+        self.supplementary = supplementary
+        self.expr = expr
+        
+    def __str__(self):
+        return repr(self.expr)
 
 class InvalidOperator(Exception):
     pass
 
 class InvalidArgument(Exception):
     pass
+
+def is_base_type(val):
+    return type(val) in [bool, float, int, str]
+
+# -------------------------------------------------------------------
 
 def expr_const(arg, state):
     return arg
@@ -72,22 +82,22 @@ expr_binary_operators = {
     }
 
 def eval_expression(expr_node, state):
+    if is_base_type(expr_node):
+        return expr_node
     virt_node = eval_script_node(expr_node, state)
-    if type(virt_node) in [bool, int, float, str]:
-        return virt_node
-    elif type(virt_node) == dict:
+    if type(virt_node) == dict:
         try:
             operator = virt_node['op']
             if operator in expr_unary_operators.keys():
-                arg = eval_expression(virt_node['arg'])
+                arg = eval_expression(virt_node['var'], state)
                 return expr_unary_operators[operator](arg, state)
             elif operator in expr_binary_operators.keys():
-                argl = eval_expression(virt_node['argl'])
-                argr = eval_expression(virt_node['argr'])
+                argl = eval_expression(virt_node['varl'], state)
+                argr = eval_expression(virt_node['varr'], state)
                 return expr_binary_operators[operator](argl, argr, state)
             else:
                 raise InvalidOperator
         except KeyError:
-            raise InvalidExpression
+            raise InvalidExpression(expr_node)
     else:
-        raise InvalidExpression
+        raise InvalidExpression(expr_node)
