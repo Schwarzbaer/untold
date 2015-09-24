@@ -1,7 +1,5 @@
 import random
 
-from conditions import eval_condition
-
 # Expressions --------------------------------------------------------
 
 class InvalidExpression(Exception):
