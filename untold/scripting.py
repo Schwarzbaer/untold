@@ -23,7 +23,11 @@ class InvalidArgument(Exception):
         return repr(self.arg)
 
 def is_base_type(val):
-    return type(val) in [bool, float, int, str]
+    if type(val) in [bool, float, int, str]:
+        return True
+    if val == None:
+        return True
+    return False
 
 # -------------------------------------------------------------------
 
@@ -31,10 +35,7 @@ def expr_const(arg, state):
     return arg
 
 def expr_get(arg, state):
-    try:
-        return state[arg]
-    except KeyError:
-        raise InvalidArgument(arg)
+    return state.get(arg, None)
 
 def expr_get_n(argl, argr, state):
     try:

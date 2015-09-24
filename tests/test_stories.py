@@ -1,4 +1,4 @@
-from untold.story import eval_condition, Story, StoryExited
+from untold.story import StoryExited
 from util import run_through_story
 from numpy.testing.utils import assert_raises
 
