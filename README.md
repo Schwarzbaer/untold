@@ -22,12 +22,9 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* Merge expressions into conditions, as conditions are just boolean-producing expressions
-* test for choice-f (depends on expr)
-* Rewrite scripting.eval_script_node(), because it's a mess!
 * 'in' operator
 * select, select-f: Select n elements (weighted?) from a list
-* 'set' should take, exclusive-or to 'val', an 'expr' expression.
+* 'set' should allow for expressions as 'var'.
 * 'set' should have explicit timing; several consecutive steps of parallel computations.
 * choice: A weight should be able to take an expression
 * Consider i18n/l10n and templating
