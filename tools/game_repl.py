@@ -2,7 +2,7 @@
 
 from pprint import pprint
 import textwrap
-from story import Story, StoryExited, NoSuchMetadata
+from untold.story import Story, StoryExited, NoSuchMetadata
 
 # REPL ---------------------------------------------------------------
 
