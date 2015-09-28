@@ -21,7 +21,7 @@ class InvalidArgument(Exception):
         return repr(self.arg)
 
 def is_base_type(val):
-    if type(val) in [bool, float, int, str]:
+    if type(val) in [bool, float, int, str, list]:
         return True
     if val == None:
         return True
@@ -76,6 +76,28 @@ def expr_or(argl, argr, state):
 def expr_and(argl, argr, state):
     return argl and argr
 
+def expr_select_m_from_set(argl, argr, state):
+    # FIXME: assert type(argl)==int and type(argr)==list
+    # assert len(argr) < argl (or easy choice if argl = len
+    new_set = set()
+    while len(new_set) < argl:
+        new_set.add(random.choice(argr))
+    return list(new_set)
+
+def expr_in(argl, argr, state):
+    # FIXME: asserts
+    return argl in argr
+
+def add_to_set(argl, argr, state):
+    new_set = set(argr)
+    new_set.add(argl)
+    return list(new_set)
+
+def remove_from_set(argl, argr, state):
+    new_set = set(argr)
+    new_set.remove(argl)
+    return list(new_set)
+
 expr_unary_operators = {
     'const': expr_const,
     'get': expr_get,
@@ -90,8 +112,12 @@ expr_binary_operators = {
     '<=': expr_smaller_equal,
     '>': expr_larger,
     '>=': expr_larger_equal,
+    # Boolean logic
     'or': expr_or,
     'and': expr_and,
+    # Set processing
+    'select-m-from-set': expr_select_m_from_set,
+    'in': expr_in,
     }
 
 def eval_expression(expr_node, state):
@@ -105,6 +131,7 @@ def eval_expression(expr_node, state):
                 arg = eval_expression(virt_node['var'], state)
                 return expr_unary_operators[operator](arg, state)
             elif operator in expr_binary_operators.keys():
+                #print(virt_node['varl'], virt_node['varr'])
                 argl = eval_expression(virt_node['varl'], state)
                 argr = eval_expression(virt_node['varr'], state)
                 res = expr_binary_operators[operator](argl, argr, state)
