@@ -1,4 +1,6 @@
-from untold.scripting import eval_script_node
+import random
+
+# Expressions --------------------------------------------------------
 
 class InvalidExpression(Exception):
     def __init__(self, supplementary = "", expr = ""):
@@ -12,10 +14,18 @@ class InvalidOperator(Exception):
     pass
 
 class InvalidArgument(Exception):
-    pass
+    def __init__(self, arg = ""):
+        self.arg = arg
+        
+    def __str__(self):
+        return repr(self.arg)
 
 def is_base_type(val):
-    return type(val) in [bool, float, int, str]
+    if type(val) in [bool, float, int, str, list]:
+        return True
+    if val == None:
+        return True
+    return False
 
 # -------------------------------------------------------------------
 
@@ -23,10 +33,7 @@ def expr_const(arg, state):
     return arg
 
 def expr_get(arg, state):
-    try:
-        return state[arg]
-    except KeyError:
-        raise InvalidArgument
+    return state.get(arg, None)
 
 def expr_get_n(argl, argr, state):
     try:
@@ -39,13 +46,11 @@ def expr_get_n(argl, argr, state):
         raise InvalidArgument
 
 def expr_plus(argl, argr, state):
-    argl_evald = eval_expression(argl, state)
-    if not type(argl_evald) in [int, float]:
+    if not type(argl) in [int, float]:
         raise InvalidArgument
-    argr_evald = eval_expression(argl, state)
-    if not type(argr_evald) in [int, float]:
+    if not type(argr) in [int, float]:
         raise InvalidArgument
-    return argl_evald + argr_evald
+    return argl + argr
 
 def expr_equal(argl, argr, state):
     return argl == argr
@@ -65,6 +70,34 @@ def expr_larger(argl, argr, state):
 def expr_larger_equal(argl, argr, state):
     return argl >= argr
 
+def expr_or(argl, argr, state):
+    return argl or argr
+
+def expr_and(argl, argr, state):
+    return argl and argr
+
+def expr_select_m_from_set(argl, argr, state):
+    # FIXME: assert type(argl)==int and type(argr)==list
+    # assert len(argr) < argl (or easy choice if argl = len
+    new_set = set()
+    while len(new_set) < argl:
+        new_set.add(random.choice(argr))
+    return list(new_set)
+
+def expr_in(argl, argr, state):
+    # FIXME: asserts
+    return argl in argr
+
+def add_to_set(argl, argr, state):
+    new_set = set(argr)
+    new_set.add(argl)
+    return list(new_set)
+
+def remove_from_set(argl, argr, state):
+    new_set = set(argr)
+    new_set.remove(argl)
+    return list(new_set)
+
 expr_unary_operators = {
     'const': expr_const,
     'get': expr_get,
@@ -79,25 +112,10 @@ expr_binary_operators = {
     '<=': expr_smaller_equal,
     '>': expr_larger,
     '>=': expr_larger_equal,
+    # Boolean logic
+    'or': expr_or,
+    'and': expr_and,
+    # Set processing
+    'select-m-from-set': expr_select_m_from_set,
+    'in': expr_in,
     }
-
-def eval_expression(expr_node, state):
-    if is_base_type(expr_node):
-        return expr_node
-    virt_node = eval_script_node(expr_node, state)
-    if type(virt_node) == dict:
-        try:
-            operator = virt_node['op']
-            if operator in expr_unary_operators.keys():
-                arg = eval_expression(virt_node['var'], state)
-                return expr_unary_operators[operator](arg, state)
-            elif operator in expr_binary_operators.keys():
-                argl = eval_expression(virt_node['varl'], state)
-                argr = eval_expression(virt_node['varr'], state)
-                return expr_binary_operators[operator](argl, argr, state)
-            else:
-                raise InvalidOperator
-        except KeyError:
-            raise InvalidExpression(expr_node)
-    else:
-        raise InvalidExpression(expr_node)
