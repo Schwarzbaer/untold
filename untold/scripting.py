@@ -78,12 +78,10 @@ class UnknownWeightType(Exception):
     pass
 
 def eval_weight(weight_node, state):
-    if type(weight_node) == int:
+    if type(weight_node) in [int, float]:
         return float(weight_node)
-    elif type(weight_node) == float:
-        return weight_node
     else:
-        raise UnknownWeightType
+        return eval_expression(weight_node, state)
 
 def eval_choice_node(choice_node, state):
     options = eval_list_node(choice_node['choice'], state)

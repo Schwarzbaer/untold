@@ -22,11 +22,8 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* 'in' operator
-* select, select-f: Select n elements (weighted?) from a list
 * 'set' should allow for expressions as 'var'.
 * 'set' should have explicit timing; several consecutive steps of parallel computations.
-* choice: A weight should be able to take an expression
 * Consider i18n/l10n and templating
 
 #### Language features
@@ -63,6 +60,9 @@ TODO
 * Add typechecking everywhere applicable
       from types import *
       assert foo is IntType, "foo is %s, not Int" % (type(foo), )
+
+##### Tests
+* A Choice where Weights are expressions
 
 ##### Documentation
 * Story syntax (JSON and YAML)
