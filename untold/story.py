@@ -133,7 +133,7 @@ class Story:
             else:
                 set_commands = [action['set']]
             for set_command in set_commands:
-                var = set_command['var']
+                var = eval_expression(set_command['var'], self.state)
                 old_val = self.get_state_var(set_command['var'])
                 new_val = eval_expression(set_command['val'], self.state)
                 self.set_state_var(var, new_val)

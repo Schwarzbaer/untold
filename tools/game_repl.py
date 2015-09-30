@@ -101,6 +101,7 @@ class REPL:
                         self.story.enact(autoacts)
                     elif cmd=='?':
                         pprint(current_node)
+                        pprint(self.story.state)
                         skip_eval = True
                     else:
                         try:

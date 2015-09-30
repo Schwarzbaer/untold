@@ -15,23 +15,22 @@ DEVELOPMENT HINTS
 KNOWN BUGS
 ----------
 
-* Evaluation of scripted nodes is lacking (see FIXME in story_writer.py)
-* Example story is highly buggy due to changes in the scripting syntax
+* Example stories are likely highly buggy due to changes in the scripting
+  syntax.
 
 TODO
 ----
 
 ##### "I'm working on that right now!"
-* 'set' should allow for expressions as 'var'.
 * 'set' should have explicit timing; several consecutive steps of parallel computations.
-* Consider i18n/l10n and templating
 
 #### Language features
-
-##### Gameplay features
-* Rewind / Forward
+* Abstract functions: Expressions that are defined at document level, then each
+  can be used by several expression-using subnodes.
+* i18n/l10n and templating
 
 ##### REPL features
+* Rewind / Forward
 * Inspecting / Editing of document / current node / current state
 * readline interface instead of raw_input()
   * tab completion
@@ -63,6 +62,7 @@ TODO
 
 ##### Tests
 * A Choice where Weights are expressions
+* An actable with a set where the var is an expression.
 
 ##### Documentation
 * Story syntax (JSON and YAML)
