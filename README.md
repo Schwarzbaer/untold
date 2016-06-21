@@ -22,9 +22,9 @@ TODO
 ----
 
 ##### "I'm working on that right now!"
-* 'set' should have explicit timing; several consecutive steps of parallel computations.
 
 #### Language features
+* 'set' should have explicit timing; several consecutive steps of parallel computations.
 * Abstract functions: Expressions that are defined at document level, then each
   can be used by several expression-using subnodes.
 * i18n/l10n and templating

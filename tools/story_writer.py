@@ -338,7 +338,9 @@ lab = \
                                     'result': {'goto': 'room4'}},
                                    ]}},
            {'id': 'room8',
-            'scene': {'presentation': {'text': "Room 8."},
+            'scene': {'presentation': {'case': [{'cond': ,
+                                                 'text': "Room 8. There is a wall to the north with three hemispherical grooves."}]},
+                      
                       'actables': [{'text': 'Go east',
                                     'result': {'goto': 'room7'}},
                                    {'text': 'Go west',
