@@ -1,5 +1,5 @@
 from untold.story import eval_condition, Story, StoryExited
-from util import run_through_story
+from .util import run_through_story
 from numpy.testing.utils import assert_raises
 
 # FIXME: These need some I/O checking, akin to a REPLL.

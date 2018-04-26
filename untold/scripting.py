@@ -1,6 +1,6 @@
 import random
 
-from conditions import eval_condition
+from .conditions import eval_condition
 
 # Scripting elements -------------------------------------------------
 
