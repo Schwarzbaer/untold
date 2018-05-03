@@ -1,4 +1,8 @@
+# TODO:
+#   De-/Serialization of stories and state should not be in Story.
+
 import json
+import yaml
 from pprint import pprint
 
 from .conditions import eval_condition
@@ -85,9 +89,13 @@ class Story:
         """Load a story. Telling it also requires a state, so start()
         or load_state() it."""
         # Read story
-        f = open(filename, 'r')
-        self.document = json.loads(f.read())
-        f.close()
+        with open(filename, 'r') as f:
+            if filename.endswith('.json'):
+                self.document = json.loads(f.read()) # FIXME: Not just f?
+            elif filename.endswith('.yaml'):
+                self.document = yaml.safe_load(f)
+            else:
+                raise ValueError # FIXME: More specific? "Wrong file extension"?
 
     # Session management
     def load_state(self, filename = 'autosave.json'):
