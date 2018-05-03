@@ -1,6 +1,7 @@
 from untold.story import Story, StoryExited
 from tests.util import run_through_story
 
+
 def test_set_state_var_1():
     story_doc = {'start_node': 'start',
                  'story': [{'id': 'start',
@@ -18,6 +19,7 @@ def test_set_state_var_1():
         except StoryExited:
             break
     assert s.get_state_var('foo') == 23
+
 
 def test_set_state_var_2():
     # Using a condition as value for a set

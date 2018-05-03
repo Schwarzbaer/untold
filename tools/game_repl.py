@@ -2,7 +2,9 @@
 
 from pprint import pprint
 import textwrap
-from story import Story, StoryExited, NoSuchMetadata
+
+from untold.story import Story, StoryExited, NoSuchMetadata
+
 
 # REPL ---------------------------------------------------------------
 
@@ -15,18 +17,23 @@ quit : Exit game.
 exit : Exit game.
 """
 
+
 class REPL:
     def __init__(self, story_file = 'story.json'):
         self.repl_commands = ['history', 'load', 'save', 'restart']
         self.story = Story(story_file)
         self.pretext()
         self.story.start()
+
     def load_game(self, savegame_file = 'autosave.json'):
         self.story.load_state()
+
     def save_game(self, savegame_file = 'autosave.json'):
         self.story.save_state()
+
     def restart_game(self):
         self.story.start()
+
     def pretext(self):
         try:
             title = self.story.get_metadata('title')
@@ -63,8 +70,8 @@ class REPL:
             self.save_game()
         elif repl_command[0] == 'restart':
             self.restart_game()
-            
-    def loop(self, debug = False):
+
+    def loop(self, debug=False):
         skip_eval = False
         while True:
             try:
