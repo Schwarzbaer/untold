@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 from pprint import pprint
 import textwrap
 
@@ -8,7 +9,7 @@ from untold.story import Story, StoryExited, NoSuchMetadata
 
 # REPL ---------------------------------------------------------------
 
-divider = '----------------------------------------------------------------------\n'
+divider = '-' * 70 + '\n'
 start_menu = \
 """start: Start new game.
 list : Show list of savegames. (Not implemented)
@@ -128,6 +129,15 @@ class REPL:
                 print()
                 break
 
+
 if __name__ == '__main__':
-    repl = REPL()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'story',
+        type=str,
+        help='Story file.',
+    )
+    args = parser.parse_args()
+    story_file = args.story
+    repl = REPL(story_file=story_file)
     repl.loop()
