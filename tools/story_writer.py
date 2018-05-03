@@ -86,98 +86,6 @@ test_story = {
            {'id': 'done',
             'special': 'exit',},],}
 
-# FIXME: This is broken right now.
-battle_story = {
- 'author': 'TheCheapestPixels',
- 'title': 'After the Storm',
- 'start_node': 'start',
- 'story': [{'id': 'start',
-            'scene': {'text': 'As the clouds finally part, the sun reveals this morning\'s vibrant green of the rolling hills to be buried under the blood and body parts of the battlefield.',
-                     },
-            'autoact': {'goto': 'field',
-                       },
-           },
-           {'id': 'field',
-            'case': [{'cond': {'var': 'warrior_on_field',
-                               'val': None,
-                              },
-                      'scene': {'text': 'A fallen warrior lies face-down on the ground.',
-                               },
-                      'actable': [{'text': 'Search warrior',
-                                   'result': {'goto': 'field',
-                                              'set': {'var': 'warrior_on_field',
-                                                      'val': 'examined',
-                                                     },
-                                             },
-                                  },
-                                  {'text': 'Leave battlefield',
-                                   'result': {'goto': 'forest'}
-                                  },
-                                 ],
-                     },
-                     {'cond': {'var': 'warrior_on_field',
-                               'val': 'examined',
-                              },
-                      'scene': {'text': 'The fallen warrior stares blankly into the sky, an amulet on his chest glittering in the sunlight.',
-                               },
-                      'actable': [{'text': 'Take amulet',
-                                   'result': {'goto': 'field',
-                                              'set': {'var': 'warrior_on_field',
-                                                      'val': 'plundered',
-                                                     },
-                                             },
-                                  },
-                                  {'text': 'Leave battlefield',
-                                   'result': {'goto': 'forest'}
-                                  },
-                                 ]
-                     },
-                     {'cond': {'var': 'warrior_on_field',
-                               'val': 'plundered'},
-                      'scene': {'text': 'The fallen warrior that you have looted stares blankly into the sky, beyond accusation.',
-                               },
-                      'actable': [{'text': 'Leave battlefield',
-                                   'result': {'goto': 'forest'}
-                                  },
-                                 ],
-                     },
-                    ],
-           },
-           {'id': 'forest',
-            'scene': {'text': 'A well-trodden path stretches between dense trees under a dark canopy. In the distance, a villager gathers firewood.',
-                     },
-            'actable': [{'text': 'Away from the battlefield.',
-                         'result': {'goto': 'villager'
-                                   },
-                        },
-                        {'text': 'Towards the battlefield.',
-                         'result': {'goto': 'field'},
-                        },
-                       ],
-           },
-           {'id': 'villager',
-            'case': [{'cond': {'var': 'warrior_on_field',
-                               'val': 'plundered'},
-                      'scene': {'text': 'The old woman interrupts her work and turns around to greet you, a tired smile on her face, but as soon as she sees the dead soldier\'s amulet on your chest, she breaks into tears.'},
-                     },
-                     {'cond': True,
-                      'scene': {'text': 'The old woman interrupts her work and turns around, a tired smile on her face. "Hello young man, what brings you this way?"' },
-                      'actable': [{'text': 'Nothing.',
-                                   'result': {'goto': 'roll_credits'}, # FIXME
-                                  },
-                                  {'text': 'I bring news from the battlefield.',
-                                   'result': {'goto': 'forest'}, # FIXME
-                                   'if': {'var': 'warrior_on_field',# FIXME
-                                          'val': 'examined'}
-                                  },
-                                 ],
-                     },
-                    ],
-           },
-           {'id': 'roll_credits',
-            'special': 'exit'},
-          ],
-}
 
 new_story_format_story = {
     'author': 'TheCheapestPixels',
@@ -263,7 +171,6 @@ choice_test_story = {'start_node': 'start',
 if __name__ == '__main__':
     stories = {
         'test': test_story,
-        'battle': battle_story,
         'newformat': new_story_format_story,
         'choicetest': choice_test_story,
     }
@@ -272,7 +179,7 @@ if __name__ == '__main__':
         'stories',
         type=str,
         nargs='+',
-        help='Stories to write. At least one of: test, battle, newformat, choicetest',
+        help='Stories to write. At least one of: test, newformat, choicetest',
     )
     args = parser.parse_args()
 
