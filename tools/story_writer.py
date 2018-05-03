@@ -28,6 +28,11 @@
 # * result: Consequences
 # * Script
 
+
+import argparse
+import json
+
+
 test_story = {
  'author': 'TheCheapestPixels',
  'title': 'Test case',
@@ -255,13 +260,29 @@ choice_test_story = {'start_node': 'start',
                      }
 #--------------------------------------------------------------------
 
-import json
-
 if __name__ == '__main__':
-    story = choice_test_story
-    f = open('story.json', 'w')
-    f.write(json.dumps(story))
-    f.write('\n')
-    print('Wrote story.')
-    f.close()
+    stories = {
+        'test': test_story,
+        'battle': battle_story,
+        'newformat': new_story_format_story,
+        'choicetest': choice_test_story,
+    }
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'stories',
+        type=str,
+        nargs='+',
+        help='Stories to write. At least one of: test, battle, newformat, choicetest',
+    )
+    args = parser.parse_args()
 
+    for story_name in args.stories:
+        if story_name not in stories:
+            print("\"{}\" is not a known story!".format(story_name))
+            continue
+        story = stories[story_name]
+        f = open('{}.json'.format(story_name), 'w')
+        f.write(json.dumps(story))
+        f.write('\n')
+        print("Wrote story \"{}\".".format(story_name))
+        f.close()
