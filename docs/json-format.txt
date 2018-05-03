@@ -9,6 +9,7 @@ Basic Workcycle
   * This continues until the story ends due to a special exit node, at which
     point StoryExited is raised.
 
+
 Document Format
 ---------------
 
@@ -66,6 +67,7 @@ Scripting Elements
                              <other_fields>: ...}]}
   When a list is evaluated, only the nodes for which the if-condition is true
   (or which do not have an if-field) are considered.
+
 
 Conditions
 ----------
