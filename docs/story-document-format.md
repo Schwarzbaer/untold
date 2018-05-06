@@ -42,6 +42,7 @@ action declared in the `special` field. Currently the only such action is to
 `exit` the story.
 
 The most minimal story in JSON:
+
       {
         "start_node": "start",
         "story": [
@@ -59,6 +60,7 @@ The most minimal story in JSON:
         special: exit
 
 ...with some more metadata:
+
       {
         "title": "Example from the docs",
         "author": "TheCheapestPixels",
@@ -71,6 +73,7 @@ The most minimal story in JSON:
       }
 
 ...and again in YAML:
+
       title: Example from the docs
       author: TheCheapestPixels
       start_node: start
@@ -102,6 +105,7 @@ A story node can also be (and typically is) a `scene node`. These do have a
     performed, then the `goto`.
 
 Thus, a typical story node would look like this in JSON:
+
       {
         "scene": {
           "presentation": {
@@ -132,6 +136,7 @@ Thus, a typical story node would look like this in JSON:
       }
 
 ...and like this in YAML:
+
       scene:
         presentation:
           text: This is the scene as it presents itself.
@@ -150,6 +155,7 @@ Thus, a typical story node would look like this in JSON:
           goto: target_node
 
 Since JSON can be embedded in YAML, a better human-readable form might be:
+
       scene:
         presentation: {text: This is the scene as it presents itself.}
         actable:
@@ -210,6 +216,7 @@ frontend (outside of debug modes). The nodes will always appear like regular,
 non-scripted nodes, but their specific appearence may chance when they are
 entered (and thus evaluated) again with a different game state in place.
 * case/cond:
+
         {
           "case": [
             {
@@ -222,10 +229,12 @@ entered (and thus evaluated) again with a different game state in place.
             }
           ]
         }
+
   During an evaluation of the node, the case will be (virtually) removed, and
   the other_fields from the first leaf node in the cases list for which cond is
   true will take its place.
 * choice/weight:
+
         {
           "choice": [
             {
@@ -238,6 +247,7 @@ entered (and thus evaluated) again with a different game state in place.
             }
           ]
         }
+
   Similar to case in functionality, except that the sub-node actually used is
   chosen at random. This choice is biased by the weights that sub-nodes have,
   with each sub-nodes chance of being chosen being its weight divided by the
@@ -248,6 +258,7 @@ entered (and thus evaluated) again with a different game state in place.
 `if`-like elements occur in lists. During evaluation, all list elements with an
 `if` get removed if the `if`'s condition is not fulfilled.
 * if:
+
         {
           <list_using_field>: [
             {
@@ -260,6 +271,7 @@ entered (and thus evaluated) again with a different game state in place.
             }
           ]
         }
+
   When a list is evaluated, only the nodes for which the if-condition is true
   (or which do not have an if-field) are considered.
 
@@ -272,19 +284,28 @@ it is relevant whether that value is equivalent to a boolean True or False.
 
 * None, booleans, strings, ints and floats get returned verbatim.
 * Constants in the story (will return that value):
+
         {'const': <foo>}
+
 * References to variables (value will be None if variable isn't specified in the
   state, its value otherwise):
+
         {'var': 'foo'}
+
 * Equality test between two sub-conditions
+
         {'op': '==',
          'varl': {<cond1>},
          'varr': {<cond2>}}
+
 * Is foo absent in the state?
+
         {'op': '==',
          'varl': {'var': 'foo'},
          'varr': {'const': None}}
+
 * (foo == True) == (bar == False)
+
         {'op': '==',
          'varl': {'op': '==',
                   'varl': {'var': 'foo'},
@@ -292,6 +313,7 @@ it is relevant whether that value is equivalent to a boolean True or False.
          'varr': {'op': '==',
                   'varl': {'var': 'bar'},
                   'varr': {'const': False}}}
+
 * Other operators: !=, <, <=, >, >=
 * TODO
   * String operators? ~=?
