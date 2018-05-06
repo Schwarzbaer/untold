@@ -70,7 +70,8 @@ The most minimal story in JSON:
           {
             "id": "start",
             "special": "exit"
-          }        ]
+          }
+        ]
       }
 
 ...and again in YAML:
