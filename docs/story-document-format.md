@@ -42,41 +42,41 @@ action declared in the `special` field. Currently the only such action is to
 `exit` the story.
 
 The most minimal story in JSON:
-    {
-      "start_node": "start",
-      "story": [
-        {
-          "id": "start",
-          "special": "exit"
-        }
-      ]
-    }
+      {
+        "start_node": "start",
+        "story": [
+          {
+            "id": "start",
+            "special": "exit"
+          }
+        ]
+      }
 
 ...and in YAML:
-    start_node: start
-    story:
-    - id: start
-      special: exit
+      start_node: start
+      story:
+      - id: start
+        special: exit
 
 ...with some more metadata:
-    {
-      "title": "Example from the docs",
-      "author": "TheCheapestPixels",
-      "start_node": "start",
-      "story": [
-        {
-          "id": "start",
-          "special": "exit"
-        }        ]
-    }
+      {
+        "title": "Example from the docs",
+        "author": "TheCheapestPixels",
+        "start_node": "start",
+        "story": [
+          {
+            "id": "start",
+            "special": "exit"
+          }        ]
+      }
 
 ...and again in YAML:
-    title: Example from the docs
-    author: TheCheapestPixels
-    start_node: start
-    story:
-    - id: start
-      special: exit
+      title: Example from the docs
+      author: TheCheapestPixels
+      start_node: start
+      story:
+      - id: start
+        special: exit
 
 
 ##### Scene Nodes
@@ -102,89 +102,89 @@ A story node can also be (and typically is) a `scene node`. These do have a
     performed, then the `goto`.
 
 Thus, a typical story node would look like this in JSON:
-    {
-      "scene": {
-        "presentation": {
-          "text": "This is the scene as it presents itself."
-        },
-        "actable": [
-          {
-            "presentation": {
-              "text": "This is a possible action you can take."
-            },
-            "result": {
-              "set": {
-                "var": "foo",
-                "val": 17
-              },
-              "goto": "target_node"
-            }
-          }
-        ],
-        "autoact": {
-          "set": {
-            "var": "foo",
-            "val": 23
+      {
+        "scene": {
+          "presentation": {
+            "text": "This is the scene as it presents itself."
           },
-          "goto": "target_node"
+          "actable": [
+            {
+              "presentation": {
+                "text": "This is a possible action you can take."
+              },
+              "result": {
+                "set": {
+                  "var": "foo",
+                  "val": 17
+                },
+                "goto": "target_node"
+              }
+            }
+          ],
+          "autoact": {
+            "set": {
+              "var": "foo",
+              "val": 23
+            },
+            "goto": "target_node"
+          }
         }
       }
-    }
 
 ...and like this in YAML:
-    scene:
-      presentation:
-        text: This is the scene as it presents itself.
-      actable:
-      - presentation:
-          text: This is a possible action you can take.
-        result:
+      scene:
+        presentation:
+          text: This is the scene as it presents itself.
+        actable:
+        - presentation:
+            text: This is a possible action you can take.
+          result:
+            set:
+              var: foo
+              val: 17
+            goto: target_node
+        autoact:
           set:
             var: foo
-            val: 17
+            val: 23
           goto: target_node
-      autoact:
-        set:
-          var: foo
-          val: 23
-        goto: target_node
 
 Since JSON can be embedded in YAML, a better human-readable form might be:
-    scene:
-      presentation: {text: This is the scene as it presents itself.}
-      actable:
-      - presentation: {text: This is a possible action you can take.}
-        result:
-          set: {var: foo, val: 17}
-          goto: target_node
-      autoact:
-        set: {var: foo, val: 23}
-        goto: target_node
-
-And putting it all together in a complete story document (and slightly extending
-it) would look like this:
-
-    title: Second example from the docs
-    author: TheCheapestPixels
-    start_node: start
-    story:
-    - id: start
-     scene:
+      scene:
         presentation: {text: This is the scene as it presents itself.}
         actable:
         - presentation: {text: This is a possible action you can take.}
           result:
             set: {var: foo, val: 17}
-            goto: exit_node
-        - presentation: {text: This is another action.}
-          result:
-            set: {var: foo, val: 5}
-            goto: exit_node
+            goto: target_node
         autoact:
           set: {var: foo, val: 23}
-          goto: exit_node
-    - id: exit_node
-      special: exit
+          goto: target_node
+
+And putting it all together in a complete story document (and slightly extending
+it) would look like this:
+
+      title: Second example from the docs
+      author: TheCheapestPixels
+      start_node: start
+      story:
+      - id: start
+       scene:
+          presentation: {text: This is the scene as it presents itself.}
+          actable:
+          - presentation: {text: This is a possible action you can take.}
+            result:
+              set: {var: foo, val: 17}
+              goto: exit_node
+          - presentation: {text: This is another action.}
+            result:
+              set: {var: foo, val: 5}
+              goto: exit_node
+          autoact:
+            set: {var: foo, val: 23}
+            goto: exit_node
+      - id: exit_node
+        special: exit
 
 
 ##### Scripting Sub-Nodes
@@ -210,34 +210,34 @@ frontend (outside of debug modes). The nodes will always appear like regular,
 non-scripted nodes, but their specific appearence may chance when they are
 entered (and thus evaluated) again with a different game state in place.
 * case/cond:
-      {
-        "case": [
-          {
-            "cond": <condition>,
-            <other_fields>: ...
-          },
-          {
-            "cond": <condition>,
-            <other_fields>: ...
-          }
-        ]
-      }
+        {
+          "case": [
+            {
+              "cond": <condition>,
+              <other_fields>: ...
+            },
+            {
+              "cond": <condition>,
+              <other_fields>: ...
+            }
+          ]
+        }
   During an evaluation of the node, the case will be (virtually) removed, and
   the other_fields from the first leaf node in the cases list for which cond is
   true will take its place.
 * choice/weight:
-      {
-        "choice": [
-          {
-            "weight": 3,
-            <other_fields>: ...
-          },
-          {
-            "weight": 2,
-            <other_fields>: ...
-          }
-        ]
-      }
+        {
+          "choice": [
+            {
+              "weight": 3,
+              <other_fields>: ...
+            },
+            {
+              "weight": 2,
+              <other_fields>: ...
+            }
+          ]
+        }
   Similar to case in functionality, except that the sub-node actually used is
   chosen at random. This choice is biased by the weights that sub-nodes have,
   with each sub-nodes chance of being chosen being its weight divided by the
@@ -248,18 +248,18 @@ entered (and thus evaluated) again with a different game state in place.
 `if`-like elements occur in lists. During evaluation, all list elements with an
 `if` get removed if the `if`'s condition is not fulfilled.
 * if:
-      {
-        <list_using_field>: [
-          {
-            "if": <condition>,
-            <other_fields>: ...
-          },
-          {
-            "if": <condition>,
-            <other_fields>: ...
-          }
-        ]
-      }
+        {
+          <list_using_field>: [
+            {
+              "if": <condition>,
+              <other_fields>: ...
+            },
+            {
+              "if": <condition>,
+              <other_fields>: ...
+            }
+          ]
+        }
   When a list is evaluated, only the nodes for which the if-condition is true
   (or which do not have an if-field) are considered.
 
@@ -272,26 +272,26 @@ it is relevant whether that value is equivalent to a boolean True or False.
 
 * None, booleans, strings, ints and floats get returned verbatim.
 * Constants in the story (will return that value):
-      {'const': <foo>}
+        {'const': <foo>}
 * References to variables (value will be None if variable isn't specified in the
   state, its value otherwise):
-      {'var': 'foo'}
+        {'var': 'foo'}
 * Equality test between two sub-conditions
-      {'op': '==',
-       'varl': {<cond1>},
-       'varr': {<cond2>}}
+        {'op': '==',
+         'varl': {<cond1>},
+         'varr': {<cond2>}}
 * Is foo absent in the state?
-      {'op': '==',
-       'varl': {'var': 'foo'},
-       'varr': {'const': None}}
+        {'op': '==',
+         'varl': {'var': 'foo'},
+         'varr': {'const': None}}
 * (foo == True) == (bar == False)
-      {'op': '==',
-       'varl': {'op': '==',
-                'varl': {'var': 'foo'},
-                'varr': {'const': True}},
-       'varr': {'op': '==',
-                'varl': {'var': 'bar'},
-                'varr': {'const': False}}}
+        {'op': '==',
+         'varl': {'op': '==',
+                  'varl': {'var': 'foo'},
+                  'varr': {'const': True}},
+         'varr': {'op': '==',
+                  'varl': {'var': 'bar'},
+                  'varr': {'const': False}}}
 * Other operators: !=, <, <=, >, >=
 * TODO
   * String operators? ~=?
