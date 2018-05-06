@@ -3,6 +3,7 @@ Untold
 
 A little engine to run interactive stories. 
 
+
 DEVELOPMENT HINTS
 -----------------
 
@@ -12,14 +13,20 @@ DEVELOPMENT HINTS
 * When implementing tags that take lists at argument, process those with
   untold.scripting.eval_list_node(node_list, state) before proceeding.
 
+
 KNOWN BUGS
 ----------
 
 * Evaluation of scripted nodes is lacking (see FIXME in story_writer.py)
 * Example story is highly buggy due to changes in the scripting syntax
 
+
 TODO
 ----
+
+* `start_node` might default to `start`.
+* Document validation
+* Optional runloop
 
 ##### "I'm working on that right now!"
 * Add expressions (and tests)
