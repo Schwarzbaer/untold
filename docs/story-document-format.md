@@ -54,6 +54,7 @@ The most minimal story in JSON:
       }
 
 ...and in YAML:
+
       start_node: start
       story:
       - id: start
