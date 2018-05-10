@@ -8,8 +8,11 @@ from pprint import pprint
 from .conditions import eval_condition
 from .scripting import eval_script_node, eval_list_node
 
+
 # Scene nodes --------------------------------------------------------
 
+
+# FIXME: What does eval_script_node return when the resulting element is empty?
 def eval_scene_node(node, state):
     # FIXME: What to do about this debugging code?
     # print("|| Node before scene script evaluation")
@@ -17,26 +20,31 @@ def eval_scene_node(node, state):
     scene_node = eval_script_node(node['scene'], state)
     # print("|| Node after scene script evaluation")
     # pprint(scene_node)
+    result_node = {}
     if 'presentation' in scene_node.keys():
+        # FIXME: Presentation evaluation here.
         presentation = eval_script_node(scene_node['presentation'], state)
-    else:
-        presentation = False
+        result_node['presentation'] = presentation
     if 'actables' in scene_node.keys():
-        actables = eval_script_node(eval_list_node(scene_node['actables'], state), state)
-    else:
-        actables = False
+        actables = eval_script_node(
+            eval_list_node(scene_node['actables'], state),
+            state,
+        )
+        # FIXME: Presentation evaluation here, too.
+        result_node['actables'] = actables
     if 'autoact' in scene_node.keys():
         autoact = eval_script_node(scene_node['autoact'], state)
-    else:
-        autoact = False
-    return {'presentation': presentation,
-            'actables': actables,
-            'autoact': autoact}
+        result_node['autoact'] = autoact
+    # FIXME: Check validity of result_node for mandatory fields.
+    return result_node
 
-# Root nodes ---------------------------------------------------------
+
+# Story nodes --------------------------------------------------------
+
 
 class StoryExited(Exception):
     pass
+
 
 class NodeNotEvaluatable(Exception):
     def __init__(self, node):
@@ -44,21 +52,24 @@ class NodeNotEvaluatable(Exception):
     def __str__(self):
         return repr(self.node)
 
+
 def eval_special_node(node, state):
     if node['special'] == 'exit':
         raise StoryExited
+
 
 node_funcs = {
     'scene': eval_scene_node,
     'special': eval_special_node,
 }
 
-# Check the nodes keywords against the functions that handle nodes
+
+# Check the node's keywords against the functions that handle nodes
 # with those keywords. Actually, one matching function will be chosen
 # at pseudo-random (order of hashing) and its result will be
 # returned. Thus each story node should have only exactly one keyword
-# that is applicable here. 
-def eval_root_node(node, state):
+# that is applicable here.
+def eval_story_node(node, state):
     node = eval_script_node(node, state)
     node_func_keys = node_funcs.keys()
     for key in node.keys():
@@ -67,10 +78,13 @@ def eval_root_node(node, state):
     # Raise exception, as there is no function to handle this node.
     raise NodeNotEvaluatable(node)
 
+
 # Story management ---------------------------------------------------
+
 
 class NoSuchMetadata(Exception):
     pass
+
 
 class Story:
     def __init__(self, story_doc = 'story.json'):
@@ -119,18 +133,21 @@ class Story:
 
     def set_state_var(self, field, value):
         self.state[field] = value
-    
+
     def get_metadata(self, field):
         try:
             return self.document[field]
         except KeyError:
             raise NoSuchMetadata
-    
+
     # Running a session
-    def eval_node(self, node_id):
+
+    # FIXME: Find a better name.
+    def eval_current_node(self):
+        node_id = self.state['__current_node']
         node = self.story[node_id]
-        return eval_root_node(node, self.state)
-    
+        return eval_story_node(node, self.state)
+
     def enact(self, action):
         # FIXME: This should also take the user choice, so it'll be
         # easier to actually show actions being rewound/forwarded, not
@@ -157,8 +174,3 @@ class Story:
                             'to': action['goto']})
             self.state['__current_node'] = action['goto']
         self.state['__history'].append(changes)
-
-    # Game Flow
-
-    def eval_current_node(self):
-        return self.eval_node(self.state['__current_node'])
