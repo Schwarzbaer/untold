@@ -27,6 +27,12 @@ TODO
 * `start_node` might default to `start`.
 * Document validation
 * Optional runloop
+* Add API to
+* API to pre-filter `presentation`s, i.e. by content type and language.
+* More compact representation of conditions
+* Scoping of variables to players / world / character for multiplayer interaction
+* In "set", get rid of "var".
+* In presentations, allow for keys to refer to specific presentations, to be looked up in translation files.
 
 ##### "I'm working on that right now!"
 * Add expressions (and tests)

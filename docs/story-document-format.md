@@ -9,12 +9,13 @@ and half of planning. In particular:
 * action nodes don't have proper `presentation`s yet, they just directly take a
   text field.
 * In `result` nodes, `set` only takes a single argument.
+* Scripting can not be used in conditions.
 
 
 Basic Workcycle
 ---------------
 
-* `Untold` generates a dictionary of `presentation`, `actable`s (list of
+* `Untold` generates a dictionary of `presentation`, `actables` (list of
   Actions) and `autoact`s (an Action to take if the user doesn't act) for the
   frontend to present to the user.
 * The frontend passes the selected Action to Untold to enact.
@@ -92,7 +93,7 @@ A story node can also be (and typically is) a `scene node`. These do have a
   frontend, be they text, audio, image, movie, 3D scenery,... It is up to the
   frontend to select the most appropriate representation and present it to the
   user.
-* `actable` contains a list of actions that the user can take. Each action
+* `actables` contains a list of actions that the user can take. Each action
   consists of a `presentation` for frontend purposes, and a `result`.
   * The `presentation` works just the same for result nodes as it does for scene
     nodes.
@@ -113,7 +114,7 @@ Thus, a typical story node would look like this in JSON:
           "presentation": {
             "text": "This is the scene as it presents itself."
           },
-          "actable": [
+          "actables": [
             {
               "presentation": {
                 "text": "This is a possible action you can take."
@@ -142,7 +143,7 @@ Thus, a typical story node would look like this in JSON:
       scene:
         presentation:
           text: This is the scene as it presents itself.
-        actable:
+        actables:
         - presentation:
             text: This is a possible action you can take.
           result:
@@ -160,7 +161,7 @@ Since JSON can be embedded in YAML, a better human-readable form might be:
 
       scene:
         presentation: {text: This is the scene as it presents itself.}
-        actable:
+        actables:
         - presentation: {text: This is a possible action you can take.}
           result:
             set: {var: foo, val: 17}
@@ -179,7 +180,7 @@ it) would look like this:
       - id: start
        scene:
           presentation: {text: This is the scene as it presents itself.}
-          actable:
+          actables:
           - presentation: {text: This is a possible action you can take.}
             result:
               set: {var: foo, val: 17}
