@@ -6,7 +6,7 @@
 #
 # Story (Node)
 # * story: Scene
-# * actable: [Interactions]
+# * actables: [Interactions]
 # * autoact: {Consequences}
 #
 # Scene
