@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# TODO:
+#   rewind / redo history
+# FIXME: repl_command has to raise an Exception or something so that it breaks
+# out of the two endless loops around it.
+
 import argparse
 from pprint import pprint
 import textwrap
@@ -72,26 +77,48 @@ class REPL:
         elif repl_command[0] == 'restart':
             self.restart_game()
 
-    def loop(self, debug=False):
-        skip_eval = False
+    def repl_entry(self, current_node, num_actions, has_autoact):
         while True:
             try:
-                if not skip_eval:
-                    current_node = self.story.eval_current_node()
-                    presentation = current_node.get('presentation', False)
-                    actables = current_node.get('actables', False)
-                    autoacts = current_node.get('autoact', False)
-                    if debug:
-                        print()
-                        print("-- Current node (pre-evaluation):")
-                        pprint(self.story.story[self.story.state['__current_node']])
-                        print("-- Current node (post-evaluation):")
-                        pprint(current_node)
-                        print("-- Current story state:")
-                        pprint(self.story.state)
-                        print()
+                cmd = input('> ')
+                if len(cmd)>0 and cmd.split(' ')[0] in self.repl_commands:
+                    self.repl_command(cmd)
+                elif cmd == "a":
+                    if has_autoact:
+                        return -1
+                    else:
+                        raise ValueError
+                elif cmd == '?':
+                    print("Current node:")
+                    pprint(current_node)
+                    print("Current state:")
+                    pprint(self.story.state)
                 else:
-                    skip_eval = False
+                    cmd_id = int(cmd)  # FIXME: Not an int? ValueError!
+                    if cmd_id > num_actions or cmd_id < 1:
+                        raise ValueError
+                    else:
+                        return cmd_id - 1
+            except ValueError:
+                print("Please enter a number from 1 to {}".format(num_actions))
+
+    def loop(self, debug=False):
+        while True:
+            try:
+                # Display everything
+                current_node = self.story.eval_current_node()
+                presentation = current_node.get('presentation', False)
+                actables = current_node.get('actables', False)
+                autoacts = current_node.get('autoact', False)
+                if debug:
+                    print()
+                    print("-- Current node (pre-evaluation):")
+                    pprint(self.story.story[self.story.state['__current_node']])
+                    print("-- Current node (post-evaluation):")
+                    pprint(current_node)
+                    print("-- Current story state:")
+                    pprint(self.story.state)
+                    print()
                 if presentation:
                     for line in textwrap.wrap(presentation['text']):
                         print(line)
@@ -101,23 +128,19 @@ class REPL:
                 if autoacts and not actables:
                     self.story.enact(autoacts)
                 else:
-                    cmd = input('> ')
-                    if len(cmd)>0 and cmd.split(' ')[0] in self.repl_commands:
-                        self.repl_command(cmd)
-                    elif cmd=="a":
-                        # FIXME: Make sure that autoact exists, otherwise reprompt
-                        self.story.enact(autoacts)
-                    elif cmd=='?':
-                        pprint(current_node)
-                        skip_eval = True
+                    # Let user choose his action, enact it, end loop
+                    if actables is False:
+                        num_actables = 0
                     else:
-                        try:
-                            # FIXME: Make sure that answer is in range, otherwise reprompt
-                            cmd_id = int(cmd)-1
-                        except ValueError:
-                            pass # FIXME: Reprompt (What was entered wasn't an int)
-                        if cmd_id > len(actables):
-                            pass # FIXME: Reprompt (list is too long)
+                        num_actables = len(actables)
+                    cmd_id = self.repl_entry(
+                        current_node,
+                        num_actables,
+                        bool(autoacts),
+                    )
+                    if cmd_id == -1:
+                        self.story.enact(autoacts)
+                    else:
                         self.story.enact(actables[cmd_id]['result'])
             except StoryExited:
                 print("Story has ended.")
