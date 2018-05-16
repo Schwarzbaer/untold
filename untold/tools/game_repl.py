@@ -153,7 +153,7 @@ class REPL:
                 break
 
 
-if __name__ == '__main__':
+def run_repl():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'story',
@@ -164,3 +164,7 @@ if __name__ == '__main__':
     story_file = args.story
     repl = REPL(story_file=story_file)
     repl.loop()
+
+
+if __name__ == '__main__':
+    run_repl()
